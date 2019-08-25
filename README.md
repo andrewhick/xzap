@@ -4,6 +4,8 @@ Recreating the Xzap shoot-em-up, by Mark Wirt, in Godot. The game was released o
 
 It is at a very early stage, focusing on the player and enemy movement around the obstacles.
 
+![Screenshot of a ship, level layout and an enemy](./Xzap screenshot.png)
+
 ## Setup
 
 * Install the latest stable version of the [Godot game engine](https://godotengine.org/). This version was created on version 3.1.1.
