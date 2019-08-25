@@ -16,7 +16,7 @@ _global_script_class_icons={
 [application]
 
 config/name="xzap"
-run/main_scene="res://scenes/Main.tscn"
+run/main_scene="res://main/Main.tscn"
 config/icon="res://icon.png"
 
 [display]
