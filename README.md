@@ -6,6 +6,6 @@ It is work in progress but allows a player to move a character around the layout
 
 ## Setup
 
-Install the latest stable version of the [Godot game engine](https://godotengine.org/). This version was created on version 3.1.1.
-Run from inside Godot using Command + B on Mac.
-Use the keyboard arrows to navigate.
+* Install the latest stable version of the [Godot game engine](https://godotengine.org/). This version was created on version 3.1.1.
+* Run from inside Godot using Command + B on Mac.
+* Use the keyboard arrows to navigate.
