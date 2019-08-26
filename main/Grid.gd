@@ -9,11 +9,12 @@ var grid_size = Vector2(38, 23)
 var grid = []
 export var layout = "x"
 export var block_style = "blue_square"
-#export var enemy_layout = 1
+# export var enemy_layout = 1
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
+onready var bullet = preload("res://ship/bullets/Bullet.tscn")
 
 # Enumerate things to help with autocomplete
-enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER}
+enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
 
 func _ready():
 	randomize()
@@ -80,7 +81,8 @@ func query_layout(chosen_layout, x, y):
 	return row[x + 3] # offsetting the first 3 characters of each row
 
 func query_cell_contents(pos, direction):
-	# Get the position of the place the player wants to move to:
+	# Get the world position of the place the player wants to move to
+	# and convert it to grid coordinates:
 	var grid_pos = world_to_map(pos) + direction
 	
 	# Return the contents of what's in the target cell.
@@ -131,6 +133,21 @@ func update_pawn_position(pawn, cell_start, cell_target):
 # Function to query what is in an adjoining cell from an object.
 func test_move(pawn, direction):
 	return query_cell_contents(pawn.position, direction)
+	
+func fire_bullet(start_position, direction):
+	start_position = start_position + direction # start from immediately in front of the ship
+	
+	# Don't create a bullet if the start position is occupied:
+	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
+		print("At cell " + str(start_position) + ",")
+		print("there's a " + str(query_cell_contents(start_position, Vector2())) + " in this block")
+		return
+	
+	# Trigger a new bullet node from start_position (in grid coordinates) and direction
+	var new_bullet = bullet.instance()
+	new_bullet.direction = direction
+	new_bullet.start_position = start_position
+	add_child(new_bullet)
 	
 #func get_cell_pawn(coordinates):
 #	for node in get_children():

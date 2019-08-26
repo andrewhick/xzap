@@ -1,4 +1,4 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf400
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf600
 {\fonttbl\f0\fmodern\fcharset0 CourierNewPSMT;}
 {\colortbl;\red255\green255\blue255;}
 {\*\expandedcolortbl;;}
@@ -11,14 +11,12 @@ This is an attempt to create components of Xzap, by Mark Wirt, to teach myself G
 \
 C16 screen ratio is (40 x 25 blocks of 8x8 pixels, or 320 x 200 pixels)\
 with approx 4 blocks (32) left and right, and 6 blocks (48) top/bottom for border.\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 So: total is 384 x 296\
+So: total is 384 x 296\
 \
 With mini C16 border (just 8 pixels), the total size is 336 x 216.\
 \
 Ship takes just under 10 seconds to go 114 tiles, so stick with 10/second for now.\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 \
+\
 Xzap game screen is (38, 23) with margins (top 2, bottom 0, left 1, right 1)\
 \
 Things to create\
@@ -44,25 +42,32 @@ Ship\
 \
 TO DO NEXT:\
 \
-Move grid code to LayoutX\
-Let LayoutX determine the mobstacle\'92s block_style\
+Shoot\
+Kill animation\
+Win condition (1 hit)\
+Loss condition (1 hit)\
+Mine countdown - trigger signal on 0\
+Mine forcefield\
+More levels\
+3 lives - UI\
+Score\
+Other enemies\
+\
+Enemy data for each level:\
+\
+Level\
+	enemy, x, y\
+	enemy, x, y\
 \
 Try creating multiple hearts in random locations and directions\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 Investigate whether to use set_cellv or grid[][]=\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 Create hit scenario with 1 life\
-Create shoot scenario\
-Create win/loss scenario with 3 lives\
-Draw lives in UI\
-Create second enemy type (not necessarily mines)\
-Create level data files\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 Tie up enemy logic\
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 \
+Investigate whether to use set_cellv or grid[][]=\
+Tie up enemy logic\
+\
 Level001:\
 Blocks: #868FF0\
+Score:  #7E453D\
+HiScore:#394bb5\
+\
 \
 Troubleshooting:\
 \

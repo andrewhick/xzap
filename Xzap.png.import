@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/Xzap screenshot.png-494eff90eb5e26704cf770dafae8241b.stex"
+path="res://.import/Xzap.png-93273620b62deb4b8c7402350cb2a8c4.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Xzap screenshot.png"
-dest_files=[ "res://.import/Xzap screenshot.png-494eff90eb5e26704cf770dafae8241b.stex" ]
+source_file="res://Xzap.png"
+dest_files=[ "res://.import/Xzap.png-93273620b62deb4b8c7402350cb2a8c4.stex" ]
 
 [params]
 

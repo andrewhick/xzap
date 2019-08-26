@@ -12,6 +12,7 @@ extends Area2D
 var type # for the object's type (SHIP)
 var grid # for the parent grid
 var direction = Vector2()
+var face_direction = Vector2(0, -1) # face up by default
 
 # Set number of moves per second:
 var time_passed = 0
@@ -32,20 +33,27 @@ func _ready():
 
 func _input(event):
 	# Change the animation and flip direction based on input
+	if event.is_action_pressed("ui_accept"):
+		print("Ready to fire at position " + str(grid.world_to_map(position)) + " and direction " + str(face_direction))
+		grid.fire_bullet(grid.world_to_map(position), face_direction)
 	if event.is_action_pressed("ui_up"):
 		$AnimatedSprite.animation = "up"
+		face_direction = Vector2(0, -1)
 		$AnimatedSprite.flip_v = false
 		$AnimatedSprite.flip_h = false
 	elif event.is_action_pressed("ui_down"):
 		$AnimatedSprite.animation = "up" # reuse :up" animation for down
+		face_direction = Vector2(0, 1)
 		$AnimatedSprite.flip_v = true
 		$AnimatedSprite.flip_h = false
 	if event.is_action_pressed("ui_left"):
 		$AnimatedSprite.animation = "right" # reuse "right" animation for left
+		face_direction = Vector2(-1, 0)
 		$AnimatedSprite.flip_v = false
 		$AnimatedSprite.flip_h = true
 	elif event.is_action_pressed("ui_right"):
 		$AnimatedSprite.animation = "right"
+		face_direction = Vector2(1, 0)
 		$AnimatedSprite.flip_v = false
 		$AnimatedSprite.flip_h = false
 

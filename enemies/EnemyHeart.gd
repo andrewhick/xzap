@@ -55,7 +55,7 @@ func _process(delta):
 			# Reverse x direction only if hitting left/right:
 			direction.x = -direction.x
 			alt_direction = direction
-		grid.block.OBSTACLE, grid.block.SHIP, grid.block.ENEMY:
+		grid.block.OBSTACLE, grid.block.SHIP, grid.block.ENEMY, grid.block.BULLET:
 			# Try moving sideways if can't move diagonally:
 			if test_direction(self, Vector2(direction.x, 0)):
 				alt_direction = Vector2(direction.x, 0)
