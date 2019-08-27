@@ -9,7 +9,7 @@ var grid # for the parent grid
 
 # Set number of moves per second:
 var time_passed = 0
-var calls_per_sec = 15
+var calls_per_sec = 20
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
 

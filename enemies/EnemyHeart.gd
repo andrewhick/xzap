@@ -2,12 +2,13 @@ extends Area2D
 
 var type # for the object's type (ENEMY)
 var grid # for the parent grid
-var direction = Vector2(-1, 1)
+export var direction = Vector2(-1, 1)
 var alt_direction = direction
 var target_data
 var target_position
 var target_block
 var diversion_block
+export var start_position = Vector2(30, 5)
 
 # Set number of moves per second:
 var time_passed = 0
@@ -19,7 +20,9 @@ func _ready():
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
 	grid = get_parent()
 	type = grid.block.ENEMY
-	position = grid.map_to_world(Vector2(30, 5)) + grid.half_tile_size
+	grid.grid[start_position.x][start_position.y] = type
+	
+	position = grid.map_to_world(start_position) + grid.half_tile_size
 	$AnimatedSprite.play()
 
 func _process(delta):

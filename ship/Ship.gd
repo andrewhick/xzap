@@ -19,12 +19,15 @@ var time_passed = 0
 var calls_per_sec = 11
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
+export var start_position = Vector2(19, 12)
 
 func _ready():
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
 	grid = get_parent()
 	type = grid.block.SHIP
-	position = grid.map_to_world(Vector2(19, 12)) + grid.half_tile_size
+	position = grid.map_to_world(start_position) + grid.half_tile_size
+	
+	grid.grid[start_position.x][start_position.y] = type
 
 	$AnimatedSprite.animation = "up"
 	$AnimatedSprite.flip_v = false
@@ -34,7 +37,6 @@ func _ready():
 func _input(event):
 	# Change the animation and flip direction based on input
 	if event.is_action_pressed("ui_accept"):
-		print("Ready to fire at position " + str(grid.world_to_map(position)) + " and direction " + str(face_direction))
 		grid.fire_bullet(grid.world_to_map(position), face_direction)
 	if event.is_action_pressed("ui_up"):
 		$AnimatedSprite.animation = "up"

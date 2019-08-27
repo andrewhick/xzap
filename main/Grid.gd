@@ -8,10 +8,12 @@ var half_tile_size = tile_size / 2 # use this to put objects in centre of cells
 var grid_size = Vector2(38, 23)
 var grid = []
 export var layout = "x"
+# Need a way to generate enemy data from a file - JSON or otherwise.
 export var block_style = "blue_square"
-# export var enemy_layout = 1
+onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
+onready var enemy_heart = preload("res://enemies/EnemyHeart.tscn")
 
 # Enumerate things to help with autocomplete
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
@@ -26,9 +28,6 @@ func _ready():
 		for j in range(grid_size.y):
 			grid[i].append(null) # add nothing in the i'th column
 			
-	var ship = get_node("Ship")
-	var enemy = get_node("EnemyHeart")
-
 	# Create local variable to hold obstacle positions:
 	var positions = []
 	
@@ -45,6 +44,13 @@ func _ready():
 		new_obstacle.position = map_to_world(pos) + half_tile_size
 		grid[pos.x][pos.y] = block.OBSTACLE
 		add_child(new_obstacle)
+		
+	# Place enemies (still needs some work)
+	for n in range (25):
+		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
+		add_enemy("heart", grid_pos, Vector2(-1, 1))
+		
+	add_ship(Vector2(19, 20)) # set back to 12 once finished
 	
 func query_layout(chosen_layout, x, y):
 	# Queries the chosen layout at the current position and return "0" or "1".
@@ -72,7 +78,7 @@ func query_layout(chosen_layout, x, y):
 	# 16x10000000011000000000000000011000000001
 	y = str("%02d" % y)
 	
-	# Set up regex:
+	# Set up regex with 1st two digits from row number, then x, then 38 digits:
 	var regex = RegEx.new()
 	regex.compile(str(y) + "x\\d{38}")
 	var row = ""
@@ -134,13 +140,42 @@ func update_pawn_position(pawn, cell_start, cell_target):
 func test_move(pawn, direction):
 	return query_cell_contents(pawn.position, direction)
 	
+func add_ship(start_position):
+	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
+		print("Can't create ship at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
+		return
+		
+	var new_ship = ship.instance()
+	# Trigger a new bullet node from start_position (in grid coordinates) and direction
+	new_ship.start_position = start_position
+	add_child(new_ship)
+	
+func add_enemy(type, start_position, direction):
+	
+	# Don't create enemy if the start position is occupied:
+	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
+		print("Can't create enemy at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
+		return
+		
+	var new_enemy
+	
+	if type == "heart":
+		new_enemy = enemy_heart.instance()
+	else:
+		print("Can't create enemy - enemy type doesn't exist.")
+		return
+
+	# Trigger a new enemy node start_position (in grid coordinates) and direction
+	new_enemy.direction = direction
+	new_enemy.start_position = start_position
+	add_child(new_enemy)
+	
 func fire_bullet(start_position, direction):
 	start_position = start_position + direction # start from immediately in front of the ship
 	
 	# Don't create a bullet if the start position is occupied:
 	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
-		print("At cell " + str(start_position) + ",")
-		print("there's a " + str(query_cell_contents(start_position, Vector2())) + " in this block")
+		print("Can't fire from " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
 		return
 	
 	# Trigger a new bullet node from start_position (in grid coordinates) and direction
