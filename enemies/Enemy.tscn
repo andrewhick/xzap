@@ -1,12 +1,10 @@
 [gd_scene load_steps=8 format=2]
 
-[ext_resource path="res://enemies/EnemyHeart.gd" type="Script" id=1]
-[ext_resource path="res://enemies/heart1.png" type="Texture" id=2]
-[ext_resource path="res://enemies/heart2.png" type="Texture" id=3]
-[ext_resource path="res://enemies/heart3.png" type="Texture" id=4]
-[ext_resource path="res://enemies/heart4.png" type="Texture" id=5]
-
-
+[ext_resource path="res://enemies/heart/EnemyHeart.gd" type="Script" id=1]
+[ext_resource path="res://enemies/heart/heart1.png" type="Texture" id=2]
+[ext_resource path="res://enemies/heart/heart2.png" type="Texture" id=3]
+[ext_resource path="res://enemies/heart/heart3.png" type="Texture" id=4]
+[ext_resource path="res://enemies/heart/heart4.png" type="Texture" id=5]
 
 [sub_resource type="SpriteFrames" id=1]
 animations = [ {

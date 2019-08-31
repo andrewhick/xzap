@@ -13,7 +13,8 @@ export var block_style = "blue_square"
 onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
-onready var enemy_heart = preload("res://enemies/EnemyHeart.tscn")
+onready var enemy_heart = preload("res://enemies/heart/EnemyHeart.tscn")
+onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
 
 # Enumerate things to help with autocomplete
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
@@ -25,6 +26,7 @@ func _ready():
 	# Godot doesn't support 2D arrays directly!
 	for i in range(grid_size.x):
 		grid.append([])
+# warning-ignore:unused_variable
 		for j in range(grid_size.y):
 			grid[i].append(null) # add nothing in the i'th column
 			
@@ -45,13 +47,14 @@ func _ready():
 		grid[pos.x][pos.y] = block.OBSTACLE
 		add_child(new_obstacle)
 		
-	# Place enemies (still needs some work)
-	for n in range (25):
+	add_ship(Vector2(19, 12))
+
+	# Place enemies:
+# warning-ignore:unused_variable
+	for n in range (5):
 		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 		add_enemy("heart", grid_pos, Vector2(-1, 1))
-		
-	add_ship(Vector2(19, 20)) # set back to 12 once finished
-	
+			
 func query_layout(chosen_layout, x, y):
 	# Queries the chosen layout at the current position and return "0" or "1".
 	
@@ -123,8 +126,12 @@ func request_move(pawn, direction):
 	# Set a variable to get whatever's in the target cell:
 	var target_block = test_move(pawn, direction)
 	
+	# Update the position if empty, otherwise keep the same position
 	if target_block == block.EMPTY:
 		return [update_pawn_position(pawn, cell_start, cell_target), block.EMPTY]
+	elif pawn.type == block.BULLET and (target_block == block.ENEMY or target_block == block.SHIP):
+#		print(str(pawn.type) + ": " + str(cell_start) + " moving to " + str(cell_target) + " containing " + str(target_block))
+		return [update_pawn_position(pawn, cell_start, cell_target), target_block]
 	else:
 		return [pawn.position, target_block]
 
@@ -140,6 +147,20 @@ func update_pawn_position(pawn, cell_start, cell_target):
 func test_move(pawn, direction):
 	return query_cell_contents(pawn.position, direction)
 	
+func force_move(pawn, direction):
+	# Move an object in a chosen direction regardless of what's in its cell, unless it's at the edge.
+	
+	# Get current and intended position:
+	var cell_start = world_to_map(pawn.position)
+	var cell_target = cell_start + direction
+	var target_block = test_move(pawn, direction)
+	
+	# Update the position if empty, otherwise keep the same position
+	if target_block == block.EDGE_UD or target_block == block.EDGE_LR:
+		return [pawn.position, target_block]
+	else:
+		return [map_to_world(cell_target) + half_tile_size, block.EMPTY]
+		
 func add_ship(start_position):
 	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
 		print("Can't create ship at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
@@ -153,10 +174,11 @@ func add_ship(start_position):
 func add_enemy(type, start_position, direction):
 	
 	# Don't create enemy if the start position is occupied:
-	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
+	var object = query_cell_contents(map_to_world(start_position), Vector2())
+	if object != block.EMPTY:
 		print("Can't create enemy at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
 		return
-		
+
 	var new_enemy
 	
 	if type == "heart":
@@ -184,7 +206,33 @@ func fire_bullet(start_position, direction):
 	new_bullet.start_position = start_position
 	add_child(new_bullet)
 	
-#func get_cell_pawn(coordinates):
-#	for node in get_children():
-#		if world_to_map(node.position) == coordinates:
-#			return(node)
+func explode_enemy(start_pos):
+	# Create 8 EnemyExplode nodes.
+	# Cycle through 9 directions, excluding (0, 0).
+	# Need to deal with case where enemy is at an edge
+	for j in range (-1, 2):
+		for i in range (-1, 2):
+							
+			print (str(i) + " " + str(j))
+			var direction = Vector2(i, j)
+			var grid_pos = world_to_map(start_pos) + direction
+
+			var start_block_contents = query_cell_contents(start_pos, Vector2(i, j))
+			if start_block_contents == block.EDGE_UD or start_block_contents == block.EDGE_LR:
+				print("Can't explode from " + str(grid_pos) + ". There's a " + str(start_block_contents) + " in the way")
+			elif i != 0 or j != 0:
+				# start from immediately in front of the enemy
+				print("new explosion")
+				var new_explode = explode.instance()
+				new_explode.direction = direction
+				new_explode.start_position = map_to_world(grid_pos) + half_tile_size
+				add_child(new_explode)
+				
+				# To do: Ensure all values of i and j get called
+				# investigate why blocks aren't spawning
+				# make sure it's working correctly on grid or map coordinates!
+	
+func set_empty(pos):
+	# Set a cell empty from absolute position:
+	var gpos = world_to_map(pos)
+	grid[gpos.x][gpos.y] = block.EMPTY

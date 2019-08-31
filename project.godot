@@ -39,6 +39,15 @@ ui_accept={
  ]
 }
 
+[layer_names]
+
+2d_render/layer_1="all"
+2d_render/layer_2="ship"
+2d_render/layer_3="bullet"
+2d_render/layer_4="enemy"
+2d_render/layer_5="forcefield"
+2d_render/layer_6="obstacle"
+
 [rendering]
 
 quality/driver/driver_name="GLES2"
