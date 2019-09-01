@@ -51,7 +51,7 @@ func _ready():
 
 	# Place enemies:
 # warning-ignore:unused_variable
-	for n in range (5):
+	for n in range (10):
 		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 		add_enemy("heart", grid_pos, Vector2(-1, 1))
 			
@@ -192,18 +192,18 @@ func add_enemy(type, start_position, direction):
 	new_enemy.start_position = start_position
 	add_child(new_enemy)
 	
-func fire_bullet(start_position, direction):
-	start_position = start_position + direction # start from immediately in front of the ship
+func fire_bullet(grid_pos, direction):
+	grid_pos = grid_pos + direction # start from immediately in front of the ship
 	
 	# Don't create a bullet if the start position is occupied:
-	if query_cell_contents(map_to_world(start_position), Vector2()) != block.EMPTY:
-		print("Can't fire from " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
+	if query_cell_contents(map_to_world(grid_pos), Vector2()) != block.EMPTY:
+		print("Can't fire from " + str(grid_pos) + ". There's a " + str(query_cell_contents(grid_pos, Vector2())) + " in the way")
 		return
 	
 	# Trigger a new bullet node from start_position (in grid coordinates) and direction
 	var new_bullet = bullet.instance()
 	new_bullet.direction = direction
-	new_bullet.start_position = start_position
+	new_bullet.start_position = grid_pos
 	add_child(new_bullet)
 	
 func explode_enemy(start_pos):
@@ -213,7 +213,6 @@ func explode_enemy(start_pos):
 	for j in range (-1, 2):
 		for i in range (-1, 2):
 							
-			print (str(i) + " " + str(j))
 			var direction = Vector2(i, j)
 			var grid_pos = world_to_map(start_pos) + direction
 
@@ -222,16 +221,11 @@ func explode_enemy(start_pos):
 				print("Can't explode from " + str(grid_pos) + ". There's a " + str(start_block_contents) + " in the way")
 			elif i != 0 or j != 0:
 				# start from immediately in front of the enemy
-				print("new explosion")
 				var new_explode = explode.instance()
 				new_explode.direction = direction
-				new_explode.start_position = map_to_world(grid_pos) + half_tile_size
+				new_explode.start_position = grid_pos
 				add_child(new_explode)
-				
-				# To do: Ensure all values of i and j get called
-				# investigate why blocks aren't spawning
-				# make sure it's working correctly on grid or map coordinates!
-	
+
 func set_empty(pos):
 	# Set a cell empty from absolute position:
 	var gpos = world_to_map(pos)

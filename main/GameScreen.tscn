@@ -26,6 +26,20 @@ margin_right = 328.0
 margin_bottom = 208.0
 color = Color( 0, 0, 0, 1 )
 
+[node name="HBoxContainer" type="HBoxContainer" parent="C16Border/BlackEdge"]
+margin_left = 48.0
+margin_right = 271.0
+margin_bottom = 7.0
+
+[node name="ColorRect" type="ColorRect" parent="C16Border/BlackEdge/HBoxContainer"]
+margin_bottom = 7.0
+color = Color( 0.494118, 0.270588, 0.239216, 1 )
+
+[node name="TextureRect" type="TextureRect" parent="C16Border/BlackEdge/HBoxContainer"]
+margin_left = 64.0
+margin_right = 71.0
+margin_bottom = 7.0
+
 [node name="WhiteArea" type="ColorRect" parent="C16Border/BlackEdge"]
 margin_left = 8.0
 margin_top = 16.0

@@ -19,6 +19,10 @@ config/name="xzap"
 run/main_scene="res://main/Main.tscn"
 config/icon="res://icon.png"
 
+[debug]
+
+settings/fps/force_fps=60
+
 [display]
 
 window/size/width=336
