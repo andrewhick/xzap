@@ -93,7 +93,7 @@ func move_to(target_position):
 		
 func _on_EnemyHeart_area_entered(area):
 	# area is the thing that entered the heart's space
-	print("Heart got hit by ", area.get_name())
+#	print("Heart got hit by ", area.get_name())
 	if area.get_name().match("*Bullet*"):
 		emit_signal("enemy_hit", area.get_name())
 		$AnimatedSprite.stop()

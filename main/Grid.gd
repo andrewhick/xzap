@@ -235,7 +235,7 @@ func explode_enemy(start_pos):
 				# More info on https://godotengine.org/qa/7336/what-are-the-semantics-of-call_deferred
 				# Using add_child(new_explode) causes errors: https://godotengine.org/qa/38401/does-cant-change-this-state-while-flushing-queries-error-mean
 				call_deferred("add_child", new_explode)
-
+				
 func set_empty(pos):
 	# Set a cell empty from absolute position:
 	var gpos = world_to_map(pos)

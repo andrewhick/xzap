@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://main/Scores.tscn" type="PackedScene" id=1]
-[ext_resource path="res://main/Grid.gd" type="Script" id=2]
+[ext_resource path="res://main/Grid.tscn" type="PackedScene" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 166, 108 )
@@ -35,10 +35,4 @@ margin_top = 16.0
 margin_right = 312.0
 margin_bottom = 200.0
 
-[node name="Grid" type="TileMap" parent="C16Border/BlackEdge/WhiteArea"]
-cell_size = Vector2( 8, 8 )
-cell_quadrant_size = 2
-collision_layer = 0
-collision_mask = 0
-format = 1
-script = ExtResource( 2 )
+[node name="Grid" parent="C16Border/BlackEdge/WhiteArea" instance=ExtResource( 2 )]
