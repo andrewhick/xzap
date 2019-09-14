@@ -190,6 +190,7 @@ func add_enemy(type, start_position, direction):
 	# Trigger a new enemy node start_position (in grid coordinates) and direction
 	new_enemy.direction = direction
 	new_enemy.start_position = start_position
+
 	add_child(new_enemy)
 	
 func fire_bullet(grid_pos, direction):
@@ -224,7 +225,10 @@ func explode_enemy(start_pos):
 				var new_explode = explode.instance()
 				new_explode.direction = direction
 				new_explode.start_position = grid_pos
-				add_child(new_explode)
+				# Use call_deferred here to avoid messing with the main thread.
+				# More info on https://godotengine.org/qa/7336/what-are-the-semantics-of-call_deferred
+				# Using add_child(new_explode) causes errors: https://godotengine.org/qa/38401/does-cant-change-this-state-while-flushing-queries-error-mean
+				call_deferred("add_child", new_explode)
 
 func set_empty(pos):
 	# Set a cell empty from absolute position:

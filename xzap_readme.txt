@@ -35,7 +35,15 @@ Ship
 
 TO DO NEXT:
 
-Hit animation
+Show number of enemies in UI
+	Score container: within container: (48,0) -> (272, 8)
+		Setting position and min size works best.
+		Also set separation = 0
+		Red bit: 0 -> 64
+		Arrow: (64, 0) -> (72, 8)
+		Mini-score: 72 -> 96
+		Lives: 120 -> 144
+		Blue Hi-Score: 160 -> 224
 Win condition (1 hit)
 Loss condition (1 hit)
 Mine countdown - trigger signal on 0

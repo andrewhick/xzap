@@ -61,9 +61,8 @@ func move_to(target_position):
 	set_process(true)
 	
 func extinguish_bullet(bullet_position):
-	var bp = grid.world_to_map(bullet_position)
+	grid.set_empty(bullet_position)
 	$AnimatedSprite.animation = "hit_left"
-	grid.grid[bp.x][bp.y] = grid.block.EMPTY
 	yield(animation, "animation_finished")
 	queue_free()
 
@@ -72,4 +71,5 @@ func _on_Bullet_area_entered(area):
 	if area.get_name().match("*Enemy*"):
 		$AnimatedSprite.stop()
 		$CollisionShape2D.set_deferred("disabled", true)
+		grid.set_empty(position)
 		queue_free()

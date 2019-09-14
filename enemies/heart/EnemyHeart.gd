@@ -9,8 +9,9 @@ var target_position
 var target_block
 var diversion_block
 export var start_position = Vector2(30, 5)
+onready var global = get_node("/root/Global")
 
-#signal hit
+signal enemy_hit
 
 # Set number of moves per second:
 var time_passed = 0
@@ -23,12 +24,9 @@ func _ready():
 	grid = get_parent()
 	type = grid.block.ENEMY
 	grid.grid[start_position.x][start_position.y] = type
-	
-#	connect("area_entered", self, "on_Bullet_area_entered")
-		
 	position = grid.map_to_world(start_position) + grid.half_tile_size
+	self.connect("enemy_hit", global, "_on_EnemyHeart_enemy_hit")
 	$AnimatedSprite.play()
-	
 
 func _process(delta):
 	# Add the time passed since the last frame:
@@ -94,14 +92,14 @@ func move_to(target_position):
 	set_process(true)
 		
 func _on_EnemyHeart_area_entered(area):
+	# area is the thing that entered the heart's space
 	print("Heart got hit by ", area.get_name())
 	if area.get_name().match("*Bullet*"):
-		# Might not need this:
-#		emit_signal("hit", area.get_name())
+		emit_signal("enemy_hit", area.get_name())
 		$AnimatedSprite.stop()
 		# Set the collision to disabled so it doesn't keep happening.
 		# set_deferred causes it to wait until safe to disable the collision.
 		$CollisionShape2D.set_deferred("disabled", true)
-		grid.explode_enemy(position)
 		grid.set_empty(position)
+		grid.explode_enemy(position)
 		queue_free()

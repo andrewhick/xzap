@@ -8,6 +8,7 @@ var grid # for the parent grid
 
 # Set number of moves per second:
 var time_passed = 0
+var move_number = 0
 var calls_per_sec = 20
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
@@ -21,7 +22,12 @@ func _ready():
 func _process(delta):
 	# Add the time passed since the last frame:
 	time_passed += delta
-			
+	
+	move_number += 1
+	if move_number == 2:
+		# Pause briefly at the 2nd step:
+		time_passed -= 0.5
+
 	# Stop processing if time interval hasn't passed yet or no movement requested:
 	if time_passed < time_for_one_call:
 		return
@@ -39,6 +45,7 @@ func _process(delta):
 			move_to(target_position)
 		grid.block.EDGE_UD, grid.block.EDGE_LR:
 			# Extinguish the explosion when it hits an edge
+			$CollisionShape2D.set_deferred("disabled", true)
 			queue_free()
 		grid.block.OBSTACLE, grid.block.ENEMY, grid.block.SHIP, grid.block.BULLET:
 			# Still move, but don't show the sprite
