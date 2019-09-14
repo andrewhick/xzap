@@ -8,22 +8,28 @@ signal score_changed
 
 # enemy_hit should already be connected from EnemyHeart
 
-export var score = 1000
+export var score = 99999999
 
 func _ready():
 	print("Score ready to initiate")
 	update_score(score)
+	
+func _on_Grid_level_start():
+	print("Level START.")
+	update_score(get_number_of_enemies())
 
 func _on_EnemyHeart_enemy_hit(name):
-	print("HIT by " + name)
-	score -= 1
-	update_score(score)
+	print("Signal: Heart hit by " + name)
+	# Show number of enemies - 1 because enemy has not yet been deleted
+	update_score(get_number_of_enemies() - 1)
 	
 func get_number_of_enemies():
-	return 999
+	var enemies = get_tree().get_nodes_in_group("enemies").size()
+	print("There are " + str(enemies) + " enemies")
+	return enemies
 	
 func update_score(new_score):
 	# change number to 8 digits
-	# render the score in the label
 	new_score = "%08d" % new_score
+	# The following signal is connected in Scores.gd
 	emit_signal("score_changed", new_score)

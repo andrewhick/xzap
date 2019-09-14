@@ -10,6 +10,7 @@ var grid = []
 export var layout = "x"
 # Need a way to generate enemy data from a file - JSON or otherwise.
 export var block_style = "blue_square"
+onready var global = get_node("/root/Global")
 onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
@@ -18,6 +19,8 @@ onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
 
 # Enumerate things to help with autocomplete
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
+
+signal level_start
 
 func _ready():
 	randomize()
@@ -54,6 +57,9 @@ func _ready():
 	for n in range (10):
 		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 		add_enemy("heart", grid_pos, Vector2(-1, 1))
+		
+	self.connect("level_start", global, "_on_Grid_level_start")
+	emit_signal("level_start")
 			
 func query_layout(chosen_layout, x, y):
 	# Queries the chosen layout at the current position and return "0" or "1".

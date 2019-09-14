@@ -44,8 +44,8 @@ Show number of enemies in UI
 		Mini-score: 72 -> 96
 		Lives: 120 -> 144
 		Blue Hi-Score: 160 -> 224
-Win condition (1 hit)
-Loss condition (1 hit)
+Win condition
+Loss condition
 Mine countdown - trigger signal on 0
 Mine forcefield
 More levels
