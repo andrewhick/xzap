@@ -12,6 +12,7 @@ export var start_position = Vector2(30, 5)
 onready var global = get_node("/root/Global")
 
 signal enemy_hit
+signal enemy_hit_ship
 
 # Set number of moves per second:
 var time_passed = 0
@@ -20,12 +21,14 @@ var calls_per_sec = 4
 var time_for_one_call = 1 / float(calls_per_sec)
 
 func _ready():
+	self.connect("enemy_hit", global, "_on_EnemyHeart_enemy_hit")
+	self.connect("enemy_hit_ship", global, "_on_EnemyHeart_enemy_hit_ship")
+	
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
 	grid = get_parent()
 	type = grid.block.ENEMY
 	grid.grid[start_position.x][start_position.y] = type
 	position = grid.map_to_world(start_position) + grid.half_tile_size
-	self.connect("enemy_hit", global, "_on_EnemyHeart_enemy_hit")
 	$AnimatedSprite.play()
 
 func _process(delta):
@@ -94,12 +97,20 @@ func move_to(target_position):
 func _on_EnemyHeart_area_entered(area):
 	# area is the thing that entered the heart's space
 #	print("Heart got hit by ", area.get_name())
+	emit_signal("enemy_hit", area.get_name())
 	if area.get_name().match("*Bullet*"):
-		emit_signal("enemy_hit", area.get_name())
-		$AnimatedSprite.stop()
-		# Set the collision to disabled so it doesn't keep happening.
-		# set_deferred causes it to wait until safe to disable the collision.
-		$CollisionShape2D.set_deferred("disabled", true)
-		grid.set_empty(position)
+		stop_enemy()
 		grid.explode_enemy(position)
 		queue_free()
+		
+	if area.get_name().match("*Ship*"): # (and not a red mine)
+		stop_enemy()
+		emit_signal("enemy_hit_ship")
+		queue_free()
+		
+func stop_enemy():
+	$AnimatedSprite.stop()
+	# Set the collision to disabled so it doesn't keep happening.
+	# set_deferred causes it to wait until safe to disable the collision.
+	$CollisionShape2D.set_deferred("disabled", true)
+	grid.set_empty(position)

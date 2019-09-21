@@ -2,7 +2,7 @@
 font-building tool.
 This font was created by “commodore16”.
 This font has a homepage where this archive and other versions may be found:
-https://fontstruct.com/fontstructions/show/1658869
+https://fontstruct.com/fontstructions/show/1668417
 
 Try Fontstruct at https://fontstruct.com
 It’s easy and it’s fun.

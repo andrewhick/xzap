@@ -99,10 +99,3 @@ func move_to(target_position):
 	set_process(false)
 	position = target_position
 	set_process(true)
-		
-#func _on_Player_body_entered(body):
-#	# The body argument above flags an error because it's never used.
-#	emit_signal("hit")
-#	# Set the collision to disabled so it doesn't keep happening.
-#	# set_deferred causes it to wait until safe to disable the collision.
-#	$CollisionShape2D.set_deferred("disabled", true)

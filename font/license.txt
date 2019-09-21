@@ -67,7 +67,7 @@ Attribution Notice”) comprising of:
 the name of the Font Designer or pseudonym, if applicable (“commodore16”);
 the title of the Font Software (“xzap”); and
 to the extent reasonably practicable, the URI
-(https://fontstruct.com/fontstructions/show/1658869) from where the Font was
+(https://fontstruct.com/fontstructions/show/1668417) from where the Font was
 originally downloaded.
 
 The Attribution Notice may be implemented in any reasonable manner. For the

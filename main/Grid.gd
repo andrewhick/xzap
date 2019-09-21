@@ -16,6 +16,8 @@ onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
 onready var enemy_heart = preload("res://enemies/heart/EnemyHeart.tscn")
 onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
+onready var label = preload("res://main/CustomLabel.tscn")
+onready var playarea = get_parent()
 
 # Enumerate things to help with autocomplete
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
@@ -24,11 +26,15 @@ signal level_start
 signal next_level
 
 func _ready():
+	
 	# Connect signals. Use global.connect if signal comes from global.
 	# Use self.connect if signal comes from grid.
 	global.connect("level_complete", self, "_on_Global_level_complete")
+	global.connect("lose_a_life", self, "_on_Global_lose_a_life")
+	global.connect("game_over", self, "_on_Global_game_over")
 	self.connect("next_level", global, "_on_Grid_next_level")
-	
+	self.connect("level_start", global, "_on_Grid_level_start")
+
 	randomize()
 	# Create a 2D array for the map data.
 	# https://godotengine.org/qa/18011/initialize-an-array-of-size-n
@@ -59,12 +65,11 @@ func _ready():
 	add_ship(Vector2(19, 12))
 
 	# Place enemies:
-# warning-ignore:unused_variable
-	for n in range (2):
+	# warning-ignore:unused_variable
+	for n in range (5):
 		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 		add_enemy("heart", grid_pos, Vector2(-1, 1))
 		
-	self.connect("level_start", global, "_on_Grid_level_start")
 	emit_signal("level_start")
 			
 func query_layout(chosen_layout, x, y):
@@ -248,6 +253,10 @@ func set_empty(pos):
 	grid[gpos.x][gpos.y] = block.EMPTY
 	
 func _on_Global_level_complete():
+	curtains()
+	emit_signal("next_level")
+	
+func curtains():
 	# Cycles through nodes and moves them gradually left or right:
 	print("End of level curtains")
 	for gap in range (20):
@@ -265,4 +274,23 @@ func _on_Global_level_complete():
 			else:
 				n.position = map_to_world(node_gpos) + half_tile_size
 				
-	emit_signal("next_level")
+func write_text_column(text):
+	# Writes text repeatedly down in a column:
+	for i in range(9):
+		var new_label = label.instance()
+		new_label.rect_position = Vector2(112, 32 + i * 16)
+		new_label.text = text
+		add_child(new_label)
+	
+func _on_Global_lose_a_life():
+	var red = float((randi() % 50 + 50)) / 100
+	var grn = float((randi() % 50 + 50)) / 100
+	var blu = float((randi() % 50 + 50)) / 100
+	playarea.color = Color(red, grn, blu, 1)
+	
+func _on_Global_game_over():
+	# Clear all nodes in case there are any left:
+	for n in self.get_children():
+		n.queue_free()
+	
+	write_text_column("GAME OVER")

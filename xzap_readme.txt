@@ -65,7 +65,7 @@ HiScore:#394bb5
 		Setting position and min size works best.
 		Also set separation = 0
 		Red bit: 0 -> 64
-		Arrow: (64, 0) -> (72, 8)
+		Arrow: 64 -> 72
 		Mini-score: 72 -> 96
 		Lives: 120 -> 144
 		Blue Hi-Score: 160 -> 224
