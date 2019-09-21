@@ -11,6 +11,7 @@ signal game_over
 # enemy_hit should already be connected from EnemyHeart
 
 export var score = 99999999
+export var level = 1
 onready var level_end_timer = $LevelEndTimer
 
 func _ready():
@@ -43,3 +44,6 @@ func _on_LevelEndTimer_timeout():
 	emit_signal("level_complete")
 	emit_signal("score_changed", "COMPLETE")
 	print("Level complete :)")
+
+func _on_Grid_next_level():
+	emit_signal("score_changed", "LVL END ")

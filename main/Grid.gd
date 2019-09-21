@@ -21,8 +21,14 @@ onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
 
 signal level_start
+signal next_level
 
 func _ready():
+	# Connect signals. Use global.connect if signal comes from global.
+	# Use self.connect if signal comes from grid.
+	global.connect("level_complete", self, "_on_Global_level_complete")
+	self.connect("next_level", global, "_on_Grid_next_level")
+	
 	randomize()
 	# Create a 2D array for the map data.
 	# https://godotengine.org/qa/18011/initialize-an-array-of-size-n
@@ -54,7 +60,7 @@ func _ready():
 
 	# Place enemies:
 # warning-ignore:unused_variable
-	for n in range (10):
+	for n in range (2):
 		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 		add_enemy("heart", grid_pos, Vector2(-1, 1))
 		
@@ -240,3 +246,23 @@ func set_empty(pos):
 	# Set a cell empty from absolute position:
 	var gpos = world_to_map(pos)
 	grid[gpos.x][gpos.y] = block.EMPTY
+	
+func _on_Global_level_complete():
+	# Cycles through nodes and moves them gradually left or right:
+	print("End of level curtains")
+	for gap in range (20):
+		# Pause code: https://twitter.com/reduzio/status/762086309695479808
+		yield(get_tree().create_timer(0.1), "timeout")
+		for n in self.get_children():
+			var node_gpos = world_to_map(n.position)
+			if node_gpos.x <= 18:
+				node_gpos.x -= 1
+			elif node_gpos.x >= 19:
+				node_gpos.x += 1
+				
+			if node_gpos.x < 0 or node_gpos.x >= grid_size.x:
+				n.queue_free()
+			else:
+				n.position = map_to_world(node_gpos) + half_tile_size
+				
+	emit_signal("next_level")

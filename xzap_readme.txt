@@ -35,24 +35,15 @@ Ship
 
 TO DO NEXT:
 
-Show number of enemies in UI
-	Score container: within container: (48,0) -> (272, 8)
-		Setting position and min size works best.
-		Also set separation = 0
-		Red bit: 0 -> 64
-		Arrow: (64, 0) -> (72, 8)
-		Mini-score: 72 -> 96
-		Lives: 120 -> 144
-		Blue Hi-Score: 160 -> 224
-Win condition
 Loss condition
 Mine countdown - trigger signal on 0
 Mine forcefield
 More levels
 3 lives - UI
-Score
-Other enemies
+Score mechanics
 Refine kill animation - pause game until they disappear
+Add level complete / game over animation
+Other enemies
 
 Enemy data for each level:
 
@@ -69,6 +60,15 @@ Level001:
 Blocks: #868FF0
 Score:  #7E453D
 HiScore:#394bb5
+
+	Score container: within container: (48,0) -> (272, 8)
+		Setting position and min size works best.
+		Also set separation = 0
+		Red bit: 0 -> 64
+		Arrow: (64, 0) -> (72, 8)
+		Mini-score: 72 -> 96
+		Lives: 120 -> 144
+		Blue Hi-Score: 160 -> 224
 
 
 Troubleshooting:
