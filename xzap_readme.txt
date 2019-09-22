@@ -35,7 +35,7 @@ Ship
 
 TO DO NEXT:
 
-Loss condition
+Level generation
 Mine countdown - trigger signal on 0
 Mine forcefield
 More levels

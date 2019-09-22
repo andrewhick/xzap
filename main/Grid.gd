@@ -7,9 +7,11 @@ var tile_size = get_cell_size()
 var half_tile_size = tile_size / 2 # use this to put objects in centre of cells
 var grid_size = Vector2(38, 23)
 var grid = []
+var level_data = {}
+export var level = 1
 export var layout = "x"
-# Need a way to generate enemy data from a file - JSON or otherwise.
 export var block_style = "blue_square"
+# Need a way to generate enemy data from a file - JSON or otherwise.
 onready var global = get_node("/root/Global")
 onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
@@ -22,23 +24,48 @@ onready var playarea = get_parent()
 # Enumerate things to help with autocomplete
 enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
 
-signal level_start
-signal next_level
+signal level_start # triggered when level has been drawn
+signal next_level # triggered when you need global to trigger a new level
 
 func _ready():
-	
 	# Connect signals. Use global.connect if signal comes from global.
 	# Use self.connect if signal comes from grid.
 	global.connect("level_complete", self, "_on_Global_level_complete")
 	global.connect("lose_a_life", self, "_on_Global_lose_a_life")
 	global.connect("game_over", self, "_on_Global_game_over")
-	self.connect("next_level", global, "_on_Grid_next_level")
+	global.connect("new_level", self, "_on_Global_new_level")
 	self.connect("level_start", global, "_on_Grid_level_start")
-
+	self.connect("next_level", global, "_on_Grid_next_level")
 	randomize()
+	create_level(level)
+	
+func create_level(new_level):
+	get_level_data(new_level)
+	clear_nodes()
+	draw_level()
+	
+func _on_Global_new_level(new_level):
+	print("Received signal to start new level")
+	level = new_level
+	create_level(level)
+	
+func get_level_data(level_no):
+	# gets data for the current level as a JSON file.
+	# Code based on: https://godotengine.org/qa/8291/how-to-parse-a-json-file-i-wrote-myself
+	var file = File.new()
+	file.open("res://level_data.json", file.READ)
+	var text = file.get_as_text()
+	level_data = JSON.parse(text).result
+	file.close()
+	# Get only the data for the current level:
+	level_data = level_data[str(level_no)]
+	layout = level_data["layout"]
+	block_style = level_data["block_style"]
+	
+func draw_level():
 	# Create a 2D array for the map data.
 	# https://godotengine.org/qa/18011/initialize-an-array-of-size-n
-	# Godot doesn't support 2D arrays directly!
+	# (Godot doesn't support 2D arrays directly!)
 	for i in range(grid_size.x):
 		grid.append([])
 # warning-ignore:unused_variable
@@ -60,36 +87,21 @@ func _ready():
 		new_obstacle.block_style = block_style
 		new_obstacle.position = map_to_world(pos) + half_tile_size
 		grid[pos.x][pos.y] = block.OBSTACLE
-		add_child(new_obstacle)
+		call_deferred("add_child", new_obstacle)
 		
 	add_ship(Vector2(19, 12))
+	place_enemies()
+	emit_signal("level_start") # ready to play
+	print("Everything has been drawn")
 
-	# Place enemies:
-	# warning-ignore:unused_variable
-	for n in range (5):
-		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
-		add_enemy("heart", grid_pos, Vector2(-1, 1))
-		
-	emit_signal("level_start")
-			
 func query_layout(chosen_layout, x, y):
 	# Queries the chosen layout at the current position and return "0" or "1".
 	
 	# Code to query data from Zylann:
 	# https://godotengine.org/qa/6491/read-&-write
 	
-	# Firstly check if there is a saved file.
-	# The file must be in the format layout_x where x is the exact name of the layout.
 	var file = File.new()
-	if not file.file_exists("res://scenery/layouts/layout_" + str(chosen_layout) + ".txt"):
-	    print("Error - no such file")
-	    return
-	
-	# Open existing file
-	if file.open("res://scenery/layouts/layout_" + str(chosen_layout) + ".txt", File.READ) != 0:
-	    print("Error opening file")
-	    return
-	
+	file.open("res://scenery/layouts/layout_" + str(chosen_layout) + ".txt", File.READ)
 	# Save the whole layout text as a single string:
 	var layout_text = file.get_as_text()
 	
@@ -100,11 +112,24 @@ func query_layout(chosen_layout, x, y):
 	
 	# Set up regex with 1st two digits from row number, then x, then 38 digits:
 	var regex = RegEx.new()
+	# Look the correct row of data:
 	regex.compile(str(y) + "x\\d{38}")
 	var row = ""
-	
 	row = regex.search(layout_text).get_string()
 	return row[x + 3] # offsetting the first 3 characters of each row
+	
+func place_enemies():
+	# Get the enemy data for the current level,
+	# Cycle through each enemy and place it at the position
+	var enemies = level_data["enemies"]
+	for e in enemies:
+		var grid_pos = Vector2(e["posx"], e["posy"]) 
+		add_enemy("heart", grid_pos, Vector2(-1, 1))
+		
+	# Alternatively generate random enemies - useful for debugging:
+#	for n in range (5):
+#		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
+#		add_enemy("heart", grid_pos, Vector2(-1, 1))
 
 func query_cell_contents(pos, direction):
 	# Get the world position of the place the player wants to move to
@@ -112,7 +137,7 @@ func query_cell_contents(pos, direction):
 	var grid_pos = world_to_map(pos) + direction
 	
 	# Return the contents of what's in the target cell.
-	# Define a boolean array for top, bottom, left and right. For example, the top left corner is:
+	# Define a boolean array for whether there's a top, bottom, left or right edge. For example, the top left corner is:
 	# [true, false, true, false]
 	var edges = [grid_pos.y < 0, grid_pos.y >= grid_size.y, grid_pos.x < 0, grid_pos.x >= grid_size.x]
 	if edges.count(true) == 2:
@@ -134,7 +159,7 @@ func request_move(pawn, direction):
 	#   Input an object and intended direction.
 	#   Returns a position and a block type.
 	#   Return nothing and a code if player cannot move there.
-	#   Return new position if player can move there.
+	#   Return new world position if player can move there.
 	
 	# Get current and intended position:
 	var cell_start = world_to_map(pawn.position)
@@ -186,7 +211,7 @@ func add_ship(start_position):
 	var new_ship = ship.instance()
 	# Trigger a new bullet node from start_position (in grid coordinates) and direction
 	new_ship.start_position = start_position
-	add_child(new_ship)
+	call_deferred("add_child", new_ship)
 	
 func add_enemy(type, start_position, direction):
 	
@@ -207,8 +232,7 @@ func add_enemy(type, start_position, direction):
 	# Trigger a new enemy node start_position (in grid coordinates) and direction
 	new_enemy.direction = direction
 	new_enemy.start_position = start_position
-
-	add_child(new_enemy)
+	call_deferred("add_child", new_enemy)
 	
 func fire_bullet(grid_pos, direction):
 	grid_pos = grid_pos + direction # start from immediately in front of the ship
@@ -222,7 +246,7 @@ func fire_bullet(grid_pos, direction):
 	var new_bullet = bullet.instance()
 	new_bullet.direction = direction
 	new_bullet.start_position = grid_pos
-	add_child(new_bullet)
+	call_deferred("add_child", new_bullet)
 	
 func explode_enemy(start_pos):
 	# Create 8 EnemyExplode nodes.
@@ -252,13 +276,8 @@ func set_empty(pos):
 	var gpos = world_to_map(pos)
 	grid[gpos.x][gpos.y] = block.EMPTY
 	
-func _on_Global_level_complete():
-	curtains()
-	emit_signal("next_level")
-	
 func curtains():
 	# Cycles through nodes and moves them gradually left or right:
-	print("End of level curtains")
 	for gap in range (20):
 		# Pause code: https://twitter.com/reduzio/status/762086309695479808
 		yield(get_tree().create_timer(0.1), "timeout")
@@ -274,13 +293,19 @@ func curtains():
 			else:
 				n.position = map_to_world(node_gpos) + half_tile_size
 				
+func _on_Global_level_complete():
+	yield(curtains(), "completed")
+	emit_signal("next_level")
+	var level_string = "LEVEL " + "%03d" % (level + 1)
+	write_text_column(level_string)
+
 func write_text_column(text):
 	# Writes text repeatedly down in a column:
 	for i in range(9):
 		var new_label = label.instance()
 		new_label.rect_position = Vector2(112, 32 + i * 16)
 		new_label.text = text
-		add_child(new_label)
+		call_deferred("add_child", new_label)
 	
 func _on_Global_lose_a_life():
 	var red = float((randi() % 50 + 50)) / 100
@@ -288,9 +313,10 @@ func _on_Global_lose_a_life():
 	var blu = float((randi() % 50 + 50)) / 100
 	playarea.color = Color(red, grn, blu, 1)
 	
-func _on_Global_game_over():
-	# Clear all nodes in case there are any left:
+func clear_nodes():
 	for n in self.get_children():
 		n.queue_free()
 	
-	write_text_column("GAME OVER")
+func _on_Global_game_over():
+	clear_nodes()
+	write_text_column("Game Over")

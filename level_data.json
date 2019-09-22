@@ -1,0 +1,35 @@
+{
+  "1" :
+  {
+    "layout" : "x",
+    "block_style" : "blue_square",
+    "enemies" : [
+      {
+        "type" : "heart",
+        "posx" : 20,
+        "posy" : 2
+      },
+      {
+        "type" : "heart",
+        "posx" : 22,
+        "posy" : 2
+      },
+      {
+        "type" : "heart",
+        "posx" : 24,
+        "posy" : 2
+      }
+    ]
+  },
+  "2" : {
+    "layout" : "x",
+    "block_style" : "yellow_square",
+    "enemies" : [
+      {
+        "type" : "heart",
+        "posx" : 2,
+        "posy" : 21
+      }
+    ]
+  }
+}
