@@ -10,12 +10,16 @@
         "posy" : 2
       },
       {
-        "type" : "heart",
+        "type" : "mine",
+        "mine_is_green" : true,
+        "mine_rank" : 1,
         "posx" : 22,
         "posy" : 2
       },
       {
-        "type" : "heart",
+        "type" : "mine",
+        "mine_is_green" : false,
+        "mine_rank" : 2,
         "posx" : 24,
         "posy" : 2
       }

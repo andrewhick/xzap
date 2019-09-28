@@ -16,7 +16,9 @@ onready var global = get_node("/root/Global")
 onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
+onready var enemy = preload("res://enemies/Enemy.tscn")
 onready var enemy_heart = preload("res://enemies/heart/EnemyHeart.tscn")
+onready var enemy_mine = preload("res://enemies/mine/EnemyMine.tscn")
 onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
 onready var label = preload("res://main/CustomLabel.tscn")
 onready var playarea = get_parent()
@@ -124,12 +126,40 @@ func place_enemies():
 	var enemies = level_data["enemies"]
 	for e in enemies:
 		var grid_pos = Vector2(e["posx"], e["posy"]) 
-		add_enemy("heart", grid_pos, Vector2(-1, 1))
+		add_enemy(e, grid_pos, Vector2(-1, 1))
 		
 	# Alternatively generate random enemies - useful for debugging:
 #	for n in range (5):
 #		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 #		add_enemy("heart", grid_pos, Vector2(-1, 1))
+
+	
+func add_enemy(enemy_data, start_position, direction):
+	
+	var enemy_type = enemy_data["type"]
+	
+	# Don't create enemy if the start position is occupied:
+	var object = query_cell_contents(map_to_world(start_position), Vector2())
+	if object != block.EMPTY:
+		print("Can't create enemy at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
+		return
+
+	var new_enemy
+	if enemy_type == "heart":
+		new_enemy = enemy_heart.instance()
+	elif enemy_type == "mine":
+		new_enemy = enemy_mine.instance()
+		new_enemy.is_green = enemy_data["mine_is_green"]
+		new_enemy.rank = enemy_data["mine_rank"]
+	else:
+		print("Can't create enemy - enemy type doesn't exist.")
+		return
+
+	# Trigger a new enemy node start_position (in grid coordinates) and direction
+	new_enemy.direction = direction
+	new_enemy.start_position = start_position
+	new_enemy.enemy_type = enemy_type
+	call_deferred("add_child", new_enemy)
 
 func query_cell_contents(pos, direction):
 	# Get the world position of the place the player wants to move to
@@ -212,27 +242,6 @@ func add_ship(start_position):
 	# Trigger a new bullet node from start_position (in grid coordinates) and direction
 	new_ship.start_position = start_position
 	call_deferred("add_child", new_ship)
-	
-func add_enemy(type, start_position, direction):
-	
-	# Don't create enemy if the start position is occupied:
-	var object = query_cell_contents(map_to_world(start_position), Vector2())
-	if object != block.EMPTY:
-		print("Can't create enemy at " + str(start_position) + ". There's a " + str(query_cell_contents(start_position, Vector2())) + " in the way")
-		return
-
-	var new_enemy
-	
-	if type == "heart":
-		new_enemy = enemy_heart.instance()
-	else:
-		print("Can't create enemy - enemy type doesn't exist.")
-		return
-
-	# Trigger a new enemy node start_position (in grid coordinates) and direction
-	new_enemy.direction = direction
-	new_enemy.start_position = start_position
-	call_deferred("add_child", new_enemy)
 	
 func fire_bullet(grid_pos, direction):
 	grid_pos = grid_pos + direction # start from immediately in front of the ship

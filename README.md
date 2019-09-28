@@ -1,6 +1,6 @@
 # xzap
 
-This project aims to recreate the Xzap shoot-em-up, by Mark Wirt, in Godot, as faithfully as possible. The game was released on the Commodore 16/+4 in 1984.
+This project aims to recreate the Xzap shoot-em-up, by Mark Wirt, in Godot. The game was released on the Commodore 16/+4 in 1984.
 
 ![Screenshot of a ship, level layout and an enemy](./Xzap.png)
 

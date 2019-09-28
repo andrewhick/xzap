@@ -40,7 +40,7 @@ func _on_Grid_level_start():
 	emit_signal("lives_changed", lives)
 	emit_signal("set_game_screen")
 
-func _on_EnemyHeart_enemy_hit(name):
+func _on_Enemy_enemy_hit(name):
 	var number_of_enemies = get_number_of_enemies()
 	# Show number of enemies - 1 because enemy has not yet been deleted
 	update_score(number_of_enemies - 1)
@@ -56,7 +56,7 @@ func get_number_of_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies").size()
 	return enemies
 	
-func _on_EnemyHeart_enemy_hit_ship():
+func _on_Enemy_enemy_hit_ship():
 	# Send a signal to animate the grid:
 	emit_signal("lose_a_life")
 	
