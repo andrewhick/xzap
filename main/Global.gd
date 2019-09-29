@@ -2,7 +2,7 @@ extends Node
 
 signal new_level
 signal score_changed
-signal lives_changed
+signal update_lives
 signal level_complete
 signal set_red_screen
 signal set_game_screen
@@ -16,7 +16,7 @@ signal lose_a_life
 # Signals are generally connected from the nodes Global interacts with
 
 # Use this to determine whether in gameplay or awaiting input
-enum status {PLAY, DRAW, AWAIT}
+enum status {PLAY, ANIMATE, AWAIT, OVER}
 
 export var score = 99999999
 export var lives = 3
@@ -24,31 +24,44 @@ export var level = 1
 export var game_status = status.PLAY
 onready var level_end_timer = $LevelEndTimer
 
-signal key_pressed_on_await
+signal key_pressed_outside_game
 
 func _ready():
-	self.connect("key_pressed_on_await", self, "_on_Global_key_pressed_on_await")
+	self.connect("key_pressed_outside_game", self, "_on_Global_key_pressed_outside_game")
 	
 func _input(event):
-	if event.is_action_pressed("ui_accept") and game_status == status.AWAIT:
-		emit_signal("key_pressed_on_await")
-		game_status = status.PLAY
+	if event.is_action_pressed("ui_accept"):
+		# Start new level:
+		if game_status == status.AWAIT:
+			emit_signal("key_pressed_outside_game")
+			game_status = status.PLAY
+		# Restart game:
+		elif game_status == status.OVER:
+			lives = 3
+			level = 1
+			score = 99999999
+			emit_signal("key_pressed_outside_game")
+			emit_signal("update_lives", lives)
+			update_score(score)
+			game_status = status.PLAY
 
 func _on_Grid_level_start():
-	print("Start level " + str(level))
-	update_score(get_number_of_enemies())
-	emit_signal("lives_changed", lives)
+	emit_signal("update_lives", lives)
 	emit_signal("set_game_screen")
+	
+func _on_Enemy_enemy_created():
+	print("Enemy created - there are now " + str(get_number_of_enemies()) + " enemies.")
+	update_score(get_number_of_enemies())
 
 func _on_Enemy_enemy_hit(name):
 	var number_of_enemies = get_number_of_enemies()
 	# Show number of enemies - 1 because enemy has not yet been deleted
 	update_score(number_of_enemies - 1)
-	emit_signal("lives_changed", lives)
+	emit_signal("update_lives", lives)
 	if number_of_enemies == 1:
 		if name.match("*Ship*") and lives == 1:
 			# Don't end level as player has lost last life
-			pass
+			print("Ship hit last enemy on last life")
 		else:
 			level_end_timer.start()
 	
@@ -63,7 +76,7 @@ func _on_Enemy_enemy_hit_ship():
 	# Update number of lives:
 	lives -= 1
 	print("Number of lives is now: " + str(lives))
-	emit_signal("lives_changed", lives) # updates the lives bar
+	emit_signal("update_lives", lives) # updates the lives bar
 	
 	if lives == 0:
 		emit_signal("score_changed", "GameOver")
@@ -86,11 +99,8 @@ func _on_Grid_next_level():
 	emit_signal("set_red_screen")
 	game_status = status.AWAIT
 
-func _on_Global_key_pressed_on_await():
+func _on_Global_key_pressed_outside_game():
 	emit_signal("new_level", level)
-	emit_signal("score_changed", "NewLevel")
-	print("New level: " + str(level))
 
 func game_over():
-	emit_signal("set_red_screen")
 	emit_signal("game_over")

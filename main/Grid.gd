@@ -16,7 +16,6 @@ onready var global = get_node("/root/Global")
 onready var ship = preload("res://ship/Ship.tscn")
 onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
-onready var enemy = preload("res://enemies/Enemy.tscn")
 onready var enemy_heart = preload("res://enemies/heart/EnemyHeart.tscn")
 onready var enemy_mine = preload("res://enemies/mine/EnemyMine.tscn")
 onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
@@ -24,10 +23,11 @@ onready var label = preload("res://main/CustomLabel.tscn")
 onready var playarea = get_parent()
 
 # Enumerate things to help with autocomplete
-enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET}
+enum block {EMPTY, SHIP, OBSTACLE, ENEMY, EDGE_UD, EDGE_LR, EDGE_CORNER, BULLET, PULSE}
 
 signal level_start # triggered when level has been drawn
 signal next_level # triggered when you need global to trigger a new level
+signal set_red_screen # triggered after game over animation
 
 func _ready():
 	# Connect signals. Use global.connect if signal comes from global.
@@ -41,13 +41,17 @@ func _ready():
 	randomize()
 	create_level(level)
 	
+func _input(event):
+	# If tab is pressed then debug:
+	if event.is_action_pressed("ui_focus_next"):
+		debug()
+	
 func create_level(new_level):
 	get_level_data(new_level)
 	clear_nodes()
 	draw_level()
 	
 func _on_Global_new_level(new_level):
-	print("Received signal to start new level")
 	level = new_level
 	create_level(level)
 	
@@ -64,17 +68,20 @@ func get_level_data(level_no):
 	layout = level_data["layout"]
 	block_style = level_data["block_style"]
 	
-func draw_level():
+func create_new_grid():
 	# Create a 2D array for the map data.
 	# https://godotengine.org/qa/18011/initialize-an-array-of-size-n
 	# (Godot doesn't support 2D arrays directly!)
+	grid = []
 	for i in range(grid_size.x):
 		grid.append([])
 # warning-ignore:unused_variable
 		for j in range(grid_size.y):
 			grid[i].append(null) # add nothing in the i'th column
-			
+
+func draw_level():
 	# Create local variable to hold obstacle positions:
+	create_new_grid()
 	var positions = []
 	
 	# Go through the whole grid and add a location to the position array if that cell is a 1:
@@ -94,7 +101,6 @@ func draw_level():
 	add_ship(Vector2(19, 12))
 	place_enemies()
 	emit_signal("level_start") # ready to play
-	print("Everything has been drawn")
 
 func query_layout(chosen_layout, x, y):
 	# Queries the chosen layout at the current position and return "0" or "1".
@@ -151,6 +157,7 @@ func add_enemy(enemy_data, start_position, direction):
 		new_enemy = enemy_mine.instance()
 		new_enemy.is_green = enemy_data["mine_is_green"]
 		new_enemy.rank = enemy_data["mine_rank"]
+		new_enemy.start_number = enemy_data["mine_start_no"]
 	else:
 		print("Can't create enemy - enemy type doesn't exist.")
 		return
@@ -198,9 +205,10 @@ func request_move(pawn, direction):
 	# Set a variable to get whatever's in the target cell:
 	var target_block = test_move(pawn, direction)
 	
-	# Update the position if empty, otherwise keep the same position
+	# Update the position if empty, otherwise keep the same position:
 	if target_block == block.EMPTY:
 		return [update_pawn_position(pawn, cell_start, cell_target), block.EMPTY]
+	# If a bullet is about to hit an enemy or ship, allow bullet to move there:
 	elif pawn.type == block.BULLET and (target_block == block.ENEMY or target_block == block.SHIP):
 #		print(str(pawn.type) + ": " + str(cell_start) + " moving to " + str(cell_target) + " containing " + str(target_block))
 		return [update_pawn_position(pawn, cell_start, cell_target), target_block]
@@ -286,22 +294,26 @@ func set_empty(pos):
 	grid[gpos.x][gpos.y] = block.EMPTY
 	
 func curtains():
+	global.game_status = global.status.ANIMATE
 	# Cycles through nodes and moves them gradually left or right:
 	for gap in range (20):
 		# Pause code: https://twitter.com/reduzio/status/762086309695479808
 		yield(get_tree().create_timer(0.1), "timeout")
 		for n in self.get_children():
-			var node_gpos = world_to_map(n.position)
-			if node_gpos.x <= 18:
-				node_gpos.x -= 1
-			elif node_gpos.x >= 19:
-				node_gpos.x += 1
+			if not n.name.match("*Label*"):
+				var node_gpos = world_to_map(n.position)
+				if node_gpos.x <= 18:
+					node_gpos.x -= 1
+				elif node_gpos.x >= 19:
+					node_gpos.x += 1
 				
-			if node_gpos.x < 0 or node_gpos.x >= grid_size.x:
-				n.queue_free()
-			else:
-				n.position = map_to_world(node_gpos) + half_tile_size
-				
+				if node_gpos.x < 0 or node_gpos.x >= grid_size.x:
+					n.queue_free()
+				else:
+					n.position = map_to_world(node_gpos) + half_tile_size
+					
+	clear_nodes()
+
 func _on_Global_level_complete():
 	yield(curtains(), "completed")
 	emit_signal("next_level")
@@ -314,7 +326,23 @@ func write_text_column(text):
 		var new_label = label.instance()
 		new_label.rect_position = Vector2(112, 32 + i * 16)
 		new_label.text = text
+		new_label.add_color_override("font_color", Color("#ffffff"))
 		call_deferred("add_child", new_label)
+		
+func debug():
+	# Clear existing labels
+	for n in self.get_children():
+		if n.name.match("*Label*"):
+			n.queue_free()
+
+	# Add label for each cell:
+	for j in range(grid_size.y):
+		for i in range(grid_size.x):
+			var new_label = label.instance()
+			new_label.rect_position = Vector2(i * 8, j * 8)
+			new_label.text = str(query_cell_contents(Vector2(i * 8, j * 8), Vector2()))
+			new_label.add_color_override("font_color", Color("#cc6600"))
+			call_deferred("add_child", new_label)
 	
 func _on_Global_lose_a_life():
 	var red = float((randi() % 50 + 50)) / 100
@@ -324,8 +352,11 @@ func _on_Global_lose_a_life():
 	
 func clear_nodes():
 	for n in self.get_children():
-		n.queue_free()
-	
+		n.propagate_call("queue_free", [])
+
 func _on_Global_game_over():
-	clear_nodes()
+	yield(curtains(), "completed")
+	emit_signal("set_red_screen")	
 	write_text_column("Game Over")
+	clear_nodes()
+	global.game_status = global.status.OVER

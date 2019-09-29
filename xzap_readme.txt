@@ -79,6 +79,10 @@ Forcefield:	blk #000000, yel 707C00, red A04A42, blu 5C4DE7, teal 1D7E86, pur 8B
 		Lives: 120 -> 144
 		Blue Hi-Score: 160 -> 224
 
+Bugs:
+
+Score does not reset to number of enemies on new level starting
+Pulse is created when there's something in the grid
 
 Troubleshooting:
 

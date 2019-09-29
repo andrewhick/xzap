@@ -47,7 +47,7 @@ func _process(delta):
 			# Extinguish the explosion when it hits an edge
 			$CollisionShape2D.set_deferred("disabled", true)
 			queue_free()
-		grid.block.OBSTACLE, grid.block.ENEMY, grid.block.SHIP, grid.block.BULLET:
+		grid.block.OBSTACLE, grid.block.ENEMY, grid.block.SHIP, grid.block.BULLET, grid.block.PULSE:
 			# Still move, but don't show the sprite
 			$Sprite.visible = false
 			move_to(target_position)

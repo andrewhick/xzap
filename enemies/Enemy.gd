@@ -21,10 +21,12 @@ export var calls_per_sec = 4
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
 
+signal enemy_created
 signal enemy_hit
 signal enemy_hit_ship
 
 func _ready():
+	self.connect("enemy_created", global, "_on_Enemy_enemy_created")
 	self.connect("enemy_hit", global, "_on_Enemy_enemy_hit")
 	self.connect("enemy_hit_ship", global, "_on_Enemy_enemy_hit_ship")
 	
@@ -34,6 +36,7 @@ func _ready():
 	grid.grid[start_position.x][start_position.y] = type
 	position = grid.map_to_world(start_position) + grid.half_tile_size
 	$AnimatedSprite.play()
+	emit_signal("enemy_created")
 
 func _process(delta):
 	# Add the time passed since the last frame:
@@ -68,7 +71,7 @@ func _process(delta):
 			# Reverse x direction only if hitting left/right:
 			direction.x = -direction.x
 			alt_direction = direction
-		grid.block.OBSTACLE, grid.block.SHIP, grid.block.ENEMY, grid.block.BULLET:
+		grid.block.OBSTACLE, grid.block.SHIP, grid.block.ENEMY, grid.block.BULLET, grid.block.PULSE:
 			# Try moving sideways if can't move diagonally:
 			if test_direction(self, Vector2(direction.x, 0)):
 				alt_direction = Vector2(direction.x, 0)
@@ -109,6 +112,7 @@ func _on_Enemy_area_entered(area):
 		
 	if area.get_name().match("*Ship*"): # (and not a red mine)
 		stop_enemy()
+		emit_signal("enemy_hit", area.get_name())
 		emit_signal("enemy_hit_ship")
 		queue_free()
 		

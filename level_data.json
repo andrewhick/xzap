@@ -13,15 +13,17 @@
         "type" : "mine",
         "mine_is_green" : true,
         "mine_rank" : 1,
-        "posx" : 22,
+        "mine_start_no" : 3,
+        "posx" : 2,
         "posy" : 2
       },
       {
         "type" : "mine",
         "mine_is_green" : false,
         "mine_rank" : 2,
+        "mine_start_no" : 2,
         "posx" : 24,
-        "posy" : 2
+        "posy" : 22
       }
     ]
   },

@@ -21,6 +21,8 @@ var calls_per_sec = 11
 var time_for_one_call = 1 / float(calls_per_sec)
 export var start_position = Vector2(19, 12)
 
+onready var global = get_node("/root/Global")
+
 func _ready():
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
 	grid = get_parent()
@@ -35,6 +37,9 @@ func _ready():
 	$AnimatedSprite.play()
 
 func _input(event):
+	if global.game_status != global.status.PLAY:
+		return
+		
 	# Change the animation and flip direction based on input
 	if event.is_action_pressed("ui_accept"):
 		grid.fire_bullet(grid.world_to_map(position), face_direction)
@@ -60,6 +65,9 @@ func _input(event):
 		$AnimatedSprite.flip_h = false
 
 func _process(delta):
+	if global.game_status != global.status.PLAY:
+		return
+	
 	# Add the time passed since the last frame:
 	time_passed += delta
 
