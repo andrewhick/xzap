@@ -25,6 +25,7 @@ export var game_status = status.PLAY
 onready var level_end_timer = $LevelEndTimer
 
 signal key_pressed_outside_game
+signal redraw_forcefields
 
 func _ready():
 	self.connect("key_pressed_outside_game", self, "_on_Global_key_pressed_outside_game")
@@ -81,6 +82,9 @@ func _on_Enemy_enemy_hit_ship():
 	if lives == 0:
 		emit_signal("score_changed", "GameOver")
 		game_over()
+		
+func _on_Forcefield_forcefield_end():
+	emit_signal("redraw_forcefields")
 	
 func update_score(new_score):
 	# change number to 8 digits

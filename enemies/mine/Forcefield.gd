@@ -1,23 +1,13 @@
 extends Node2D
 
-# A forcefield is a child of a mine.
-# This allows the forcefield and the child to interact with each other.
-# The forcefield itself has no area, and only creates child nodes (pulses).
-# The pulses created by the forcefield, however, are added as a child of the grid.
-# This is consistent with the way enemies and bullets are created.
-
-# To do:
-# Create a single row of variable width that animates
-# Create multiple rows
-# Stagger the animation row by row
-# Build interactions
+# Hierarchy: Grid > Mine > Forcefield > Pulse
+# The forcefield generates a rectangle of pulses, with animation staggered row by row.
 
 # Assumptions:
-# Forcefield never moves
-# if forcefields overlap
-# Redraw if another forcefield disappears
-# Forcefield kills ship
-# Forcefield prevents enemies from moving
+# Forcefield never moves.
+# Forcefields can't technically overlap but are redrawn if another forcefield disappears.
+# Forcefield kills ship.
+# Forcefield prevents enemies from moving.
 
 export var gpos = Vector2() # Grid pos of mine (centre of forcefield)
 onready var mine = get_parent()
@@ -37,12 +27,27 @@ export var calls_per_sec = 10
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
 
+# Forcefields can be redrawn at any point until they time out:
+var allow_redraw = true
+
+onready var global = get_node("/root/Global")
 onready var pulse = preload("res://enemies/mine/Pulse.tscn")
 
+# This signal:
+# - Asks the parent mine to clean up its children
+# - Sends a global signal to all mines to redraw their pulses.
 signal forcefield_end
 
 func _ready():
+	self.connect("forcefield_end", global, "_on_Forcefield_forcefield_end")
+	global.connect("redraw_forcefields", self, "_on_Global_redraw_forcefields")
 	draw_forcefield()
+	
+func _on_Global_redraw_forcefields():
+	if allow_redraw:
+		print("Redrawing forcefield")
+		clear_pulses()
+		draw_forcefield()
 
 func draw_forcefield():
 	# Add nodes row by row.
@@ -83,17 +88,19 @@ func place_pulse(pulse_gpos, offset):
 			call_deferred("add_child", new_pulse)
 
 func _on_Timer_timeout():
-	emit_signal("forcefield_end")
+	allow_redraw = false
 	print("Removing forcefield")
 	$Timer.queue_free()
+	clear_pulses()
+	emit_signal("forcefield_end")
+	queue_free()
+	
+func clear_pulses():
 	for n in self.get_children():
 		if n.name.match("*Pulse*"):
 			grid.set_empty(n.position + mine.position)
 			n.queue_free()
-	
-	# Check if there are any other mines around and redraw their forcefields
-	queue_free()
-		
+
 func stop_enemy():
 	$AnimatedSprite.stop()
 	$CollisionShape2D.set_deferred("disabled", true)
