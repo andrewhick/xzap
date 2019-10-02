@@ -15,7 +15,7 @@ func _ready():
 	$LivesBox/SkullBackground.rect_size.x = 0
 
 func _on_Global_score_changed(new_score):
-	$ScoreBox/Score.text = new_score
+	$ScoreBox/Score.text = str(new_score)
 	
 func _on_Global_update_lives(new_lives):
 	# Accepts a value from 0 to 3

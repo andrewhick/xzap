@@ -51,13 +51,13 @@ func _on_Grid_level_start():
 	emit_signal("set_game_screen")
 	
 func _on_Enemy_enemy_created():
-	print("Enemy created - there are now " + str(get_number_of_enemies()) + " enemies.")
-	update_score(get_number_of_enemies())
+	score = get_number_of_enemies()
+	update_score(score)
 
 func _on_Enemy_enemy_hit(name):
 	var number_of_enemies = get_number_of_enemies()
-	# Show number of enemies - 1 because enemy has not yet been deleted
-	update_score(number_of_enemies - 1)
+	score = number_of_enemies - 1
+	update_score(score)
 	emit_signal("update_lives", lives)
 	if number_of_enemies == 1:
 		if name.match("*Ship*") and lives == 1:
@@ -71,18 +71,24 @@ func get_number_of_enemies():
 	return enemies
 	
 func _on_Enemy_enemy_hit_ship():
+	lose_a_life()
+		
+func _on_Bullet_bullet_hit_ship():
+	lose_a_life()
+		
+func lose_a_life():
 	# Send a signal to animate the grid:
 	emit_signal("lose_a_life")
 	
 	# Update number of lives:
 	lives -= 1
-	print("Number of lives is now: " + str(lives))
+	print("Lives -> " + str(lives))
 	emit_signal("update_lives", lives) # updates the lives bar
 	
 	if lives == 0:
-		emit_signal("score_changed", "GameOver")
+		emit_signal("score_changed", score)
 		game_over()
-		
+
 func _on_Forcefield_forcefield_end():
 	emit_signal("redraw_forcefields")
 	

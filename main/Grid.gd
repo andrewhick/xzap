@@ -18,7 +18,7 @@ onready var obstacle = preload("res://scenery/Obstacle.tscn")
 onready var bullet = preload("res://ship/bullets/Bullet.tscn")
 onready var enemy_heart = preload("res://enemies/heart/EnemyHeart.tscn")
 onready var enemy_mine = preload("res://enemies/mine/EnemyMine.tscn")
-onready var explode = preload("res://enemies/explode/EnemyExplode.tscn")
+onready var explode = preload("res://enemies/explode/Explode.tscn")
 onready var label = preload("res://main/CustomLabel.tscn")
 onready var playarea = get_parent()
 
@@ -266,7 +266,7 @@ func fire_bullet(grid_pos, direction):
 	call_deferred("add_child", new_bullet)
 	
 func explode_enemy(start_pos):
-	# Create 8 EnemyExplode nodes.
+	# Create 8 Explode nodes.
 	# Cycle through 9 directions, excluding (0, 0).
 	# Need to deal with case where enemy is at an edge
 	for j in range (-1, 2):

@@ -35,8 +35,11 @@ Ship
 
 TO DO NEXT:
 
-Mine countdown - trigger signal on 0
-Mine forcefield
+Forcefield kills ship
+Mine sequential logic
+Bullet rebounds from mines if there are other enemies
+Bullet rebounds off red mine
+Bullet rebound takes precedence over non rebounding bullet
 Set delay for enemies to enter screen
 --- LEVEL 1 FULLY FUNCTIONAL
 Score mechanics
@@ -81,11 +84,4 @@ Forcefield:	blk #000000, yel 707C00, red A04A42, blu 5C4DE7, teal 1D7E86, pur 8B
 
 Bugs:
 
-Score does not reset to number of enemies on new level starting
-Pulse is created when there's something in the grid
-
-Troubleshooting:
-
-If sprites appear blurry, reimport without filter option: https://godotengine.org/qa/38477/sprites-animatedsprite-although-showing-correctly-editor 
-
-set_pos and get_pos do not exist in Godot 3.1. Read and write to `position` instead.
+none :)

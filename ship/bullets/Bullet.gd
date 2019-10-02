@@ -4,9 +4,11 @@ extends Area2D
 export var start_position = Vector2() # in grid coordinates
 export var direction = Vector2()
 onready var animation = get_node("AnimatedSprite")
+onready var global = get_node("/root/Global")
 
 var type # for the object's type (BULLET)
 var grid # for the parent grid
+var is_rebounding = false
 
 # Set number of moves per second:
 var time_passed = 0
@@ -14,10 +16,11 @@ var calls_per_sec = 20
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
 
-# apply a velocity
-# destroy when hits an edge
+signal bullet_hit_ship
 	
 func _ready():
+	self.connect("bullet_hit_ship", global, "_on_Bullet_bullet_hit_ship")
+	
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
 	grid = get_parent()
 	type = grid.block.BULLET
@@ -45,15 +48,20 @@ func _process(delta):
 	match target_block:
 		grid.block.EMPTY:
 			move_to(target_position)
-		grid.block.OBSTACLE, grid.block.EDGE_UD, grid.block.EDGE_LR:
+		grid.block.OBSTACLE, grid.block.EDGE_UD, grid.block.EDGE_LR, grid.block.PULSE:
 			extinguish_bullet(target_position)
 		grid.block.SHIP:
 			# add code to remove bullet and kill player
 			print("Bullet hit ship!")
 			move_to(target_position)
 		grid.block.ENEMY:
-			# add code to remove bullet and kill enemy
+			# Signals will then remove or rebound bullet and kill enemy.
 			move_to(target_position)
+		grid.block.BULLET:
+			if not is_rebounding:
+				stop_bullet()
+			else:
+				move_to(target_position)
 
 func move_to(target_position):
 	set_process(false)
@@ -67,9 +75,32 @@ func extinguish_bullet(bullet_position):
 	queue_free()
 
 func _on_Bullet_area_entered(area):
-#	print("Bullet has hit " + area.get_name())
+	print(self.get_name() + " has hit " + area.get_name())
 	if area.get_name().match("*Enemy*"):
-		$AnimatedSprite.stop()
-		$CollisionShape2D.set_deferred("disabled", true)
-		grid.set_empty(position)
-		queue_free()
+		if area.can_be_hit == false:
+			rebound_bullet()
+		else:
+			stop_bullet()
+			
+	elif area.get_name().match("*Ship*") and is_rebounding:
+		emit_signal("bullet_hit_ship")
+		stop_bullet()
+		
+	elif area.get_name().match("*Bullet*") and area.is_rebounding:
+		# In the game, rebounding bullets take precedence over normal ones
+		# so this removes the one that isn't rebounding.
+		# This is an additional chance to catch stray bullets from _process
+		stop_bullet()
+		
+func rebound_bullet():
+	print("Rebound bullet")
+	grid.set_empty(position)
+	is_rebounding = true
+	direction = -direction
+	$AnimatedSprite.animation = "rebound"
+	
+func stop_bullet():
+	grid.set_empty(position)
+	$AnimatedSprite.stop()
+	$CollisionShape2D.set_deferred("disabled", true)
+	queue_free()

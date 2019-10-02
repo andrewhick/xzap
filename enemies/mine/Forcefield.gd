@@ -44,8 +44,9 @@ func _ready():
 	draw_forcefield()
 	
 func _on_Global_redraw_forcefields():
+	# Triggered when one forcefield ends.
+	# Redraws forcefields for any existing mines, in case there were any overlaps.
 	if allow_redraw:
-		print("Redrawing forcefield")
 		clear_pulses()
 		draw_forcefield()
 
@@ -58,8 +59,6 @@ func draw_forcefield():
 	var left = clamp(gpos.x - size_l, 0, gpos.x)
 	var right = clamp(gpos.x + size_r, gpos.x, grid.grid_size.x - 1)
 	var anim_offset = 0
-	print("Drawing forcefield from " + str(left) + "," + str(up) + " to " + str(right) + "," + str(down))
-	print("  centered on " + str(gpos))
 	
 	for j in range (up, down + 1):
 		for i in range (left, right + 1):
@@ -89,7 +88,6 @@ func place_pulse(pulse_gpos, offset):
 
 func _on_Timer_timeout():
 	allow_redraw = false
-	print("Removing forcefield")
 	$Timer.queue_free()
 	clear_pulses()
 	emit_signal("forcefield_end")

@@ -5,10 +5,10 @@ export var green = Color("3C8D00")
 export var is_green = false
 
 # Variables to use for forcefield
-export var size_u = 6
-export var size_d = 6
-export var size_l = 6
-export var size_r = 6
+export var size_u = 4
+export var size_d = 4
+export var size_l = 4
+export var size_r = 4
 export var start_number = 3
 export var ongoing_direction = Vector2()
 
@@ -34,6 +34,7 @@ func _ready():
 
 	$AnimatedSprite.set_sprite_frames(current_animation)
 	$AnimatedSprite.frame = 9 - start_number
+	can_be_hit = false
 
 func _on_AnimatedSprite_animation_finished():
 	# Stop moving the mine and store the current direction for later

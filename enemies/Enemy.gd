@@ -13,6 +13,7 @@ var diversion_block
 export var enemy_type = "heart"
 export var start_position = Vector2(30, 5)
 export var direction = Vector2(-1, 1)
+export var can_be_hit = true
 onready var global = get_node("/root/Global")
 
 # Set number of moves per second:
@@ -104,11 +105,11 @@ func move_to(target_position):
 func _on_Enemy_area_entered(area):
 	# area is the thing that entered the enemy's space
 #	print("Enemy " + enemy_type + " got hit by ", area.get_name())
-	if area.get_name().match("*Bullet*"):
-		emit_signal("enemy_hit", area.get_name())
-		stop_enemy()
-		grid.explode_enemy(position)
-		queue_free()
+	if area.get_name().match("*Bullet*") and self.can_be_hit == true:
+			emit_signal("enemy_hit", area.get_name())
+			stop_enemy()
+			grid.explode_enemy(position)
+			queue_free()
 		
 	if area.get_name().match("*Ship*"): # (and not a red mine)
 		stop_enemy()
