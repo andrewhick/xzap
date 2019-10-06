@@ -17,7 +17,7 @@ animations = [ {
 } ]
 
 [sub_resource type="RectangleShape2D" id=2]
-extents = Vector2( 3, 3 )
+extents = Vector2( 1, 1 )
 
 [node name="Pulse" type="Area2D"]
 script = ExtResource( 1 )
@@ -28,3 +28,4 @@ frame = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 2 )
+[connection signal="area_entered" from="." to="." method="_on_Pulse_area_entered"]

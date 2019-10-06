@@ -83,18 +83,27 @@ func _on_Bullet_area_entered(area):
 		else:
 			stop_bullet()
 			
-	elif area.get_name().match("*Ship*") and is_rebounding:
-		emit_signal("bullet_hit_ship")
-		stop_bullet()
+	elif area.get_name().match("*Ship*"):
+		# If bullet is at same position as ship, it's a hit, otherwise fine
+		var ship_gpos = grid.world_to_map(area.position)
+		var bullet_gpos = grid.world_to_map(self.position)
+		print("Bullet at " + str(bullet_gpos) + " hit ship at " + str(ship_gpos))
+		if ship_gpos == bullet_gpos:
+			print("Rebounding bullet has hit ship")
+			emit_signal("bullet_hit_ship")
+			stop_bullet()
 		
-	elif area.get_name().match("*Bullet*") and area.is_rebounding:
+	elif area.get_name().match("*Bullet*") and not self.is_rebounding:
 		# In the game, rebounding bullets take precedence over normal ones
-		# so this removes the one that isn't rebounding.
+		# so this removes any that isn't rebounding.
 		# This is an additional chance to catch stray bullets from _process
 		stop_bullet()
 		
 	elif area.get_name().match("*Pulse*"):
 		stop_bullet()
+		
+	else:
+		print("Bullet hit " + area.get_name() + " and I don't know what to do")
 		
 func rebound_bullet():
 	print("Rebound bullet")

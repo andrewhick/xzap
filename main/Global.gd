@@ -22,6 +22,7 @@ export var score = 99999999
 export var lives = 3
 export var level = 1
 export var game_status = status.PLAY
+var allow_death_by_forcefield = true
 onready var level_end_timer = $LevelEndTimer
 
 signal key_pressed_outside_game
@@ -66,7 +67,8 @@ func _on_Enemy_enemy_killed(killed_enemy, what_enemy_hit):
 			print("Ship hit last enemy on last life")
 		else:
 			level_end_timer.start()
-	
+
+	# If it's a mine that's been killed then resequence mines and make first mine hittable
 	if killed_enemy.match("*Mine*"):
 		resequence_mines()
 	
@@ -77,8 +79,6 @@ func _on_Enemy_enemy_killed(killed_enemy, what_enemy_hit):
 	
 	# Assume that a chaser is NOT an enemy.
 	
-	# If it's a mine that's been killed then resequence mines and make first mine hittable
-	
 func make_first_mine_hittable():
 	print("Making first mine hittable")
 	for n in get_tree().get_nodes_in_group("mines"):
@@ -87,7 +87,6 @@ func make_first_mine_hittable():
 			n.set_green()
 	
 func resequence_mines():
-	print("Resequencing mines:")
 	for n in get_tree().get_nodes_in_group("mines"):
 		n.rank -= 1
 		print(str(n.rank))
@@ -100,8 +99,18 @@ func get_number_of_mines():
 	var mines = get_tree().get_nodes_in_group("mines").size()
 	return mines
 	
+func get_number_of_forcefields():
+	var forcefields = get_tree().get_nodes_in_group("forcefields").size()
+	return forcefields
+	
 func _on_Enemy_enemy_hit_ship():
 	lose_a_life()
+	
+func _on_Forcefield_pulse_hit_ship():
+	if allow_death_by_forcefield:
+		# Prevent further forcefield deaths until all are clear again:
+		allow_death_by_forcefield = false
+		lose_a_life()
 		
 func _on_Bullet_bullet_hit_ship():
 	lose_a_life()
@@ -120,7 +129,13 @@ func lose_a_life():
 		game_over()
 
 func _on_Forcefield_forcefield_end():
-	emit_signal("redraw_forcefields")
+	# Once forcefields are clear, allow ship to be killed by them again.
+	# Assume that the 'last' forcefield is still on screen at this point:
+	if get_number_of_forcefields() <= 1:
+		allow_death_by_forcefield = true
+		print("Forcefields clear. Can be killed by forcefields again")
+	else:
+		emit_signal("redraw_forcefields")
 	
 func update_score(new_score):
 	# change number to 8 digits

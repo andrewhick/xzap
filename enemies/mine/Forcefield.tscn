@@ -2,7 +2,9 @@
 
 [ext_resource path="res://enemies/mine/Forcefield.gd" type="Script" id=1]
 
-[node name="Forcefield" type="Node2D"]
+[node name="Forcefield" type="Node2D" groups=[
+"forcefields",
+]]
 script = ExtResource( 1 )
 
 [node name="Timer" type="Timer" parent="."]

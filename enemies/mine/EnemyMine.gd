@@ -18,9 +18,6 @@ onready var negative_numbers = preload("res://enemies/mine/mine_neg_countdown9.t
 onready var forcefield = preload("res://enemies/mine/Forcefield.tscn")
 onready var current_animation = positive_numbers
 
-# Set the mine's rank. If 1, it is green and will be shot first.
-export var rank = 1
-
 func _ready():
 	if is_green:
 		set_green()
@@ -41,14 +38,16 @@ func set_green():
 	$AnimatedSprite.set_sprite_frames(current_animation)
 
 func _on_AnimatedSprite_animation_finished():
-	# Stop moving the mine and store the current direction for later
+	# Store the current direction for later.
 	ongoing_direction = direction
+	# Stop moving the mine and create the forcefield.
 	direction = Vector2()
 	create_forcefield(size_u, size_d, size_l, size_r)
 
 func create_forcefield(u, d, l, r):
 	# Create a forcefield with defined size: up, down, left and right.
 	# Assume all forcefields last the same duration.
+#	print("Creating forcefield with mine going in " + str(ongoing_direction))
 	var new_ff = forcefield.instance()
 	new_ff.size_u = u
 	new_ff.size_d = d
@@ -60,9 +59,7 @@ func create_forcefield(u, d, l, r):
 
 func _on_Forcefield_forcefield_end():
 	direction = ongoing_direction
+	if direction == Vector2():
+		print("Nudging mine which had come to a halt")
+		direction = Vector2(1, 1)
 	$AnimatedSprite.frame = 9 - start_number
-	
-# Add code for:
-# Shoot green mine, move remaining mines up a rank, make rank 1 green
-
-# Receive a signal to make it hittable

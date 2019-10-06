@@ -5,7 +5,6 @@ extends Area2D
 
 var type # for the object's type (ENEMY)
 var grid # for the parent grid
-var alt_direction = direction
 var target_data
 var target_position
 var target_block
@@ -14,7 +13,9 @@ export var enemy_type = "heart"
 export var start_position = Vector2(30, 5)
 export var direction = Vector2(-1, 1)
 export var can_be_hit = true
+export var rank = 1 # For mines. Call in parent class to make it more accessible.
 onready var global = get_node("/root/Global")
+var alt_direction = direction
 
 # Set number of moves per second:
 var time_passed = 0

@@ -19,7 +19,6 @@ export var size_u = 4
 export var size_d = 4
 export var size_l = 4
 export var size_r = 4
-export var duration = 5 # number of seconds the forcefield lasts
 
 # Forcefields can be redrawn at any point until they time out:
 var allow_redraw = true
@@ -31,9 +30,11 @@ onready var pulse = preload("res://enemies/mine/Pulse.tscn")
 # - Asks the parent mine to clean up its children
 # - Sends a global signal to all mines to redraw their pulses.
 signal forcefield_end
+signal pulse_hit_ship
 
 func _ready():
 	self.connect("forcefield_end", global, "_on_Forcefield_forcefield_end")
+	self.connect("pulse_hit_ship", global, "_on_Forcefield_pulse_hit_ship")
 	global.connect("redraw_forcefields", self, "_on_Global_redraw_forcefields")
 	draw_forcefield()
 	

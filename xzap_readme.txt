@@ -36,9 +36,9 @@ Ship
 TO DO NEXT:
 
 Bugs:
-	Bullet needs to hit ship on a smaller collision layer	
+	Mines sometimes stay still after they're trapped in a forcefield. Fixed but not sure why mine direction gets set to 0.
+	Bullets STILL sometimes stay behind when repeatedly hitting a forcefield.
 
-Forcefield kills ship
 Bullet rebound takes precedence over non rebounding bullet
 Set delay for enemies to enter screen
 --- LEVEL 1 FULLY FUNCTIONAL
