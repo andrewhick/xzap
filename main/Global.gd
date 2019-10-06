@@ -54,21 +54,51 @@ func _on_Enemy_enemy_created():
 	score = get_number_of_enemies()
 	update_score(score)
 
-func _on_Enemy_enemy_hit(name):
+func _on_Enemy_enemy_killed(killed_enemy, what_enemy_hit):
 	var number_of_enemies = get_number_of_enemies()
+	var number_of_mines = get_number_of_mines()
 	score = number_of_enemies - 1
 	update_score(score)
 	emit_signal("update_lives", lives)
 	if number_of_enemies == 1:
-		if name.match("*Ship*") and lives == 1:
+		if what_enemy_hit.match("*Ship*") and lives == 1:
 			# Don't end level as player has lost last life
 			print("Ship hit last enemy on last life")
 		else:
 			level_end_timer.start()
 	
+	if killed_enemy.match("*Mine*"):
+		resequence_mines()
+	
+	# Check if the enemies either are, or are about to be, only mines:
+	# Assume that mines are always sequentially ordered.
+	if number_of_enemies - number_of_mines <= 1:
+		make_first_mine_hittable()
+	
+	# Assume that a chaser is NOT an enemy.
+	
+	# If it's a mine that's been killed then resequence mines and make first mine hittable
+	
+func make_first_mine_hittable():
+	print("Making first mine hittable")
+	for n in get_tree().get_nodes_in_group("mines"):
+		if n.rank == 1:
+			n.can_be_hit = true
+			n.set_green()
+	
+func resequence_mines():
+	print("Resequencing mines:")
+	for n in get_tree().get_nodes_in_group("mines"):
+		n.rank -= 1
+		print(str(n.rank))
+	
 func get_number_of_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies").size()
 	return enemies
+	
+func get_number_of_mines():
+	var mines = get_tree().get_nodes_in_group("mines").size()
+	return mines
 	
 func _on_Enemy_enemy_hit_ship():
 	lose_a_life()

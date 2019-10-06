@@ -21,12 +21,6 @@ export var size_l = 4
 export var size_r = 4
 export var duration = 5 # number of seconds the forcefield lasts
 
-# Set number of moves per second:
-var time_passed = 0
-export var calls_per_sec = 10
-# Use float here, otherwise this evaluates to 0.
-var time_for_one_call = 1 / float(calls_per_sec)
-
 # Forcefields can be redrawn at any point until they time out:
 var allow_redraw = true
 

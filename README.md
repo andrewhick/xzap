@@ -23,4 +23,7 @@ Your objective is to destroy the aliens on each level, and so progress through 1
 
 ### How to play the game
 
-![Heart](./enemies/heart/heart1.png) HEARTS - can be destroyed at any time.
+|Enemy|Description|
+|---|---|
+|![Heart](./enemies/heart/heart1.png)|HEARTS - can be destroyed at any time.|
+|![Mine](./enemies/mine/graphics/mine.png)|MINES - mines count down from 9, 7 or 5 to 0 and then produce a force-field. If your ship is caught in this force-field, then you lose a life.<br>*NOTE:* A force-field can only be produced from the solid sides of a mine. Mines can only be destroyed once all the aliens have been eliminated. Green mines must be destroyed first. You must hit a green mine on one of its solid sides to destroy it. As each green mine is destroyed, another turns green. Your shots bounce off red mines.<br>*NOTE:* Your ship can touch the red mines, but not the green mines.|

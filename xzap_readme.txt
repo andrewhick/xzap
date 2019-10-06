@@ -35,10 +35,10 @@ Ship
 
 TO DO NEXT:
 
+Bugs:
+	Bullet needs to hit ship on a smaller collision layer	
+
 Forcefield kills ship
-Mine sequential logic
-Bullet rebounds from mines if there are other enemies
-Bullet rebounds off red mine
 Bullet rebound takes precedence over non rebounding bullet
 Set delay for enemies to enter screen
 --- LEVEL 1 FULLY FUNCTIONAL

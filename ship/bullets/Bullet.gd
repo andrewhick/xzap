@@ -75,7 +75,8 @@ func extinguish_bullet(bullet_position):
 	queue_free()
 
 func _on_Bullet_area_entered(area):
-	print(self.get_name() + " has hit " + area.get_name())
+	# Keep this - useful for debugging:
+	# print(self.get_name() + " has hit " + area.get_name())
 	if area.get_name().match("*Enemy*"):
 		if area.can_be_hit == false:
 			rebound_bullet()
@@ -90,6 +91,9 @@ func _on_Bullet_area_entered(area):
 		# In the game, rebounding bullets take precedence over normal ones
 		# so this removes the one that isn't rebounding.
 		# This is an additional chance to catch stray bullets from _process
+		stop_bullet()
+		
+	elif area.get_name().match("*Pulse*"):
 		stop_bullet()
 		
 func rebound_bullet():

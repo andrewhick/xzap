@@ -23,12 +23,12 @@ export var calls_per_sec = 4
 var time_for_one_call = 1 / float(calls_per_sec)
 
 signal enemy_created
-signal enemy_hit
+signal enemy_killed
 signal enemy_hit_ship
 
 func _ready():
 	self.connect("enemy_created", global, "_on_Enemy_enemy_created")
-	self.connect("enemy_hit", global, "_on_Enemy_enemy_hit")
+	self.connect("enemy_killed", global, "_on_Enemy_enemy_killed")
 	self.connect("enemy_hit_ship", global, "_on_Enemy_enemy_hit_ship")
 	
 	# Define the parent grid, and type of object from what's enumerated in the parent grid.
@@ -106,16 +106,20 @@ func _on_Enemy_area_entered(area):
 	# area is the thing that entered the enemy's space
 #	print("Enemy " + enemy_type + " got hit by ", area.get_name())
 	if area.get_name().match("*Bullet*") and self.can_be_hit == true:
-			emit_signal("enemy_hit", area.get_name())
-			stop_enemy()
-			grid.explode_enemy(position)
-			queue_free()
-		
-	if area.get_name().match("*Ship*"): # (and not a red mine)
+		emit_signal("enemy_killed", self.get_name(), area.get_name())
 		stop_enemy()
-		emit_signal("enemy_hit", area.get_name())
-		emit_signal("enemy_hit_ship")
+		grid.explode_enemy(position)
 		queue_free()
+		
+	if area.get_name().match("*Ship*"):
+		# Check that it's not a red mine:
+		if not (self.get_name().match("*Mine*") and not self.is_green):
+			stop_enemy()
+			emit_signal("enemy_killed", self.get_name(), area.get_name())
+			emit_signal("enemy_hit_ship")
+			queue_free()
+		else:
+			print("Ship hit red mine")
 		
 func stop_enemy():
 	$AnimatedSprite.stop()

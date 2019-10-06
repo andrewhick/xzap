@@ -21,7 +21,15 @@
         "type" : "mine",
         "mine_is_green" : false,
         "mine_rank" : 2,
-        "mine_start_no" : 8,
+        "mine_start_no" : 7,
+        "posx" : 24,
+        "posy" : 22
+      },
+      {
+        "type" : "mine",
+        "mine_is_green" : false,
+        "mine_rank" : 3,
+        "mine_start_no" : 5,
         "posx" : 24,
         "posy" : 22
       }

@@ -23,10 +23,7 @@ export var rank = 1
 
 func _ready():
 	if is_green:
-		# This deviates from the original game, to make the numbers distinguishable regardless of colour:
-		current_animation = negative_numbers
-		$AnimatedSprite.modulate = green
-		$MineEdge.modulate = green
+		set_green()
 	else:
 		current_animation = positive_numbers
 		$AnimatedSprite.modulate = red
@@ -34,7 +31,14 @@ func _ready():
 
 	$AnimatedSprite.set_sprite_frames(current_animation)
 	$AnimatedSprite.frame = 9 - start_number
-	can_be_hit = false
+	can_be_hit = false # This is defined in the parent class
+	
+func set_green():
+	# This deviates from the original game, to make the numbers distinguishable regardless of colour:
+	current_animation = negative_numbers
+	$AnimatedSprite.modulate = green
+	$MineEdge.modulate = green
+	$AnimatedSprite.set_sprite_frames(current_animation)
 
 func _on_AnimatedSprite_animation_finished():
 	# Stop moving the mine and store the current direction for later
@@ -60,3 +64,5 @@ func _on_Forcefield_forcefield_end():
 	
 # Add code for:
 # Shoot green mine, move remaining mines up a rank, make rank 1 green
+
+# Receive a signal to make it hittable
