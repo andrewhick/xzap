@@ -80,7 +80,6 @@ func _on_Enemy_enemy_killed(killed_enemy, what_enemy_hit):
 	# Assume that a chaser is NOT an enemy.
 	
 func make_first_mine_hittable():
-	print("Making first mine hittable")
 	for n in get_tree().get_nodes_in_group("mines"):
 		if n.rank == 1:
 			n.can_be_hit = true
@@ -89,7 +88,6 @@ func make_first_mine_hittable():
 func resequence_mines():
 	for n in get_tree().get_nodes_in_group("mines"):
 		n.rank -= 1
-		print(str(n.rank))
 	
 func get_number_of_enemies():
 	var enemies = get_tree().get_nodes_in_group("enemies").size()
@@ -133,7 +131,6 @@ func _on_Forcefield_forcefield_end():
 	# Assume that the 'last' forcefield is still on screen at this point:
 	if get_number_of_forcefields() <= 1:
 		allow_death_by_forcefield = true
-		print("Forcefields clear. Can be killed by forcefields again")
 	else:
 		emit_signal("redraw_forcefields")
 	
@@ -146,7 +143,7 @@ func update_score(new_score):
 func _on_LevelEndTimer_timeout():
 	emit_signal("level_complete")
 	emit_signal("score_changed", "COMPLETE")
-	print("Level complete")
+	print("Level " + str(level) + "complete")
 
 func _on_Grid_next_level():
 	emit_signal("score_changed", "LevelEnd")

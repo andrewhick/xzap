@@ -32,10 +32,12 @@ func _ready():
 	
 func set_green():
 	# This deviates from the original game, to make the numbers distinguishable regardless of colour:
+	var remember_frame = $AnimatedSprite.frame
 	current_animation = negative_numbers
 	$AnimatedSprite.modulate = green
 	$MineEdge.modulate = green
 	$AnimatedSprite.set_sprite_frames(current_animation)
+	$AnimatedSprite.frame = remember_frame
 
 func _on_AnimatedSprite_animation_finished():
 	# Store the current direction for later.

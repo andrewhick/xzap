@@ -93,8 +93,3 @@ func clear_pulses():
 		if n.name.match("*Pulse*"):
 			grid.set_empty(n.position + mine.position)
 			n.queue_free()
-
-func stop_enemy():
-	$AnimatedSprite.stop()
-	$CollisionShape2D.set_deferred("disabled", true)
-	grid.set_empty(position)

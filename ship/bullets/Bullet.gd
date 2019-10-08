@@ -48,14 +48,12 @@ func _process(delta):
 	match target_block:
 		grid.block.EMPTY:
 			move_to(target_position)
-		grid.block.OBSTACLE, grid.block.EDGE_UD, grid.block.EDGE_LR, grid.block.PULSE:
+		grid.block.OBSTACLE, grid.block.EDGE_UD, grid.block.EDGE_LR:
 			extinguish_bullet(target_position)
-		grid.block.SHIP:
-			# add code to remove bullet and kill player
-			print("Bullet hit ship!")
-			move_to(target_position)
-		grid.block.ENEMY:
-			# Signals will then remove or rebound bullet and kill enemy.
+		grid.block.PULSE:
+			stop_bullet()
+		grid.block.SHIP, grid.block.ENEMY:
+			# Signals will then remove or rebound bullet and kill enemy or player.
 			move_to(target_position)
 		grid.block.BULLET:
 			if not is_rebounding:
@@ -87,7 +85,7 @@ func _on_Bullet_area_entered(area):
 		# If bullet is at same position as ship, it's a hit, otherwise fine
 		var ship_gpos = grid.world_to_map(area.position)
 		var bullet_gpos = grid.world_to_map(self.position)
-		print("Bullet at " + str(bullet_gpos) + " hit ship at " + str(ship_gpos))
+#		print("Bullet at " + str(bullet_gpos) + " hit ship at " + str(ship_gpos))
 		if ship_gpos == bullet_gpos:
 			print("Rebounding bullet has hit ship")
 			emit_signal("bullet_hit_ship")
@@ -100,9 +98,10 @@ func _on_Bullet_area_entered(area):
 		stop_bullet()
 		
 	elif area.get_name().match("*Pulse*"):
+		print("Bullet hit pulse at " + str(grid.world_to_map(position)))
 		stop_bullet()
 		
-	else:
+	elif not area.get_name().match("*Explode*"):
 		print("Bullet hit " + area.get_name() + " and I don't know what to do")
 		
 func rebound_bullet():

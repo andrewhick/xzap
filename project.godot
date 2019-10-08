@@ -26,6 +26,7 @@ Global="*res://main/Global.tscn"
 [debug]
 
 settings/fps/force_fps=60
+gdscript/warnings/unused_argument=false
 
 [display]
 

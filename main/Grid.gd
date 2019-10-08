@@ -138,7 +138,6 @@ func place_enemies():
 #	for n in range (5):
 #		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 #		add_enemy("heart", grid_pos, Vector2(-1, 1))
-
 	
 func add_enemy(enemy_data, start_position, direction):
 	
@@ -256,7 +255,7 @@ func fire_bullet(grid_pos, direction):
 	
 	# Don't create a bullet if the start position is occupied:
 	if query_cell_contents(map_to_world(grid_pos), Vector2()) != block.EMPTY:
-		print("Can't fire from " + str(grid_pos) + ". There's a " + str(query_cell_contents(grid_pos, Vector2())) + " in the way")
+#		print("Can't fire from " + str(grid_pos) + ". There's a " + str(query_cell_contents(grid_pos, Vector2())) + " in the way")
 		return
 	
 	# Trigger a new bullet node from start_position (in grid coordinates) and direction
@@ -330,6 +329,7 @@ func write_text_column(text):
 		call_deferred("add_child", new_label)
 		
 func debug():
+	# Press tab to show what's in each cell.
 	# Clear existing labels
 	for n in self.get_children():
 		if n.name.match("*Label*"):
