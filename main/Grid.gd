@@ -98,7 +98,7 @@ func draw_level():
 		grid[pos.x][pos.y] = block.OBSTACLE
 		call_deferred("add_child", new_obstacle)
 		
-	add_ship(Vector2(19, 12))
+	add_ship(Vector2(36, 21))
 	place_enemies()
 	emit_signal("level_start") # ready to play
 
@@ -131,13 +131,32 @@ func place_enemies():
 	# Cycle through each enemy and place it at the position
 	var enemies = level_data["enemies"]
 	for e in enemies:
-		var grid_pos = Vector2(e["posx"], e["posy"]) 
-		add_enemy(e, grid_pos, Vector2(-1, 1))
+		var grid_pos = Vector2(e["pos"][0], e["pos"][1])
+		var start_dir = get_start_dir_from_pos(grid_pos)
+#		var start_dir = Vector2(e["dir"][0], e["dir"][1])
+		add_enemy(e, grid_pos, start_dir)
 		
 	# Alternatively generate random enemies - useful for debugging:
 #	for n in range (5):
 #		var grid_pos = Vector2(randi() % int(grid_size.x), randi() % int(grid_size.y))
 #		add_enemy("heart", grid_pos, Vector2(-1, 1))
+
+func get_start_dir_from_pos(start_pos):
+	# Gets a start direction automatically from the start position of the enemy.
+	# Assume that the enemy always moves towards the centre of the screen at the start of the level.
+	var start_dir_x
+	var start_dir_y
+	if start_pos.x <= 19:
+		start_dir_x = 1
+	else:
+		start_dir_x = -1
+
+	if start_pos.y <= 11:
+		start_dir_y = 1
+	else:
+		start_dir_y = -1
+
+	return Vector2(start_dir_x, start_dir_y)
 	
 func add_enemy(enemy_data, start_position, direction):
 	

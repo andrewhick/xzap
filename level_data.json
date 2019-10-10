@@ -5,33 +5,34 @@
     "block_style" : "blue_square",
     "enemies" : [
       {
-        "type" : "heart",
-        "posx" : 20,
-        "posy" : 2
-      },
-      {
         "type" : "mine",
         "mine_is_green" : true,
         "mine_rank" : 1,
         "mine_start_no" : 9,
-        "posx" : 2,
-        "posy" : 2
+        "pos" : [28, 0]
       },
       {
         "type" : "mine",
         "mine_is_green" : false,
         "mine_rank" : 2,
-        "mine_start_no" : 7,
-        "posx" : 24,
-        "posy" : 22
+        "mine_start_no" : 9,
+        "pos" : [9, 0]
       },
       {
-        "type" : "mine",
-        "mine_is_green" : false,
-        "mine_rank" : 3,
-        "mine_start_no" : 5,
-        "posx" : 24,
-        "posy" : 22
+        "type" : "heart",
+        "pos" : [9, 22]
+      },
+      {
+        "type" : "heart",
+        "pos" : [37, 17]
+      },
+      {
+        "type" : "heart",
+        "pos" : [0, 17]
+      },
+      {
+        "type" : "heart",
+        "pos" : [28, 22]
       }
     ]
   },
@@ -41,8 +42,7 @@
     "enemies" : [
       {
         "type" : "heart",
-        "posx" : 2,
-        "posy" : 21
+        "pos" : [2, 21]
       }
     ]
   }

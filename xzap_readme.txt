@@ -37,7 +37,8 @@ TO DO NEXT:
 
 Bugs:
 	Mines sometimes stay still after they're trapped in a forcefield. Fixed but not sure why mine direction gets set to 0.
-	Bullets STILL sometimes stay behind when repeatedly hitting a forcefield.
+	Mines (green ones?) can continue counting during a forcefield.
+	Enemies can actually pass through pulses!
 
 Bullet rebound takes precedence over non rebounding bullet
 Set delay for enemies to enter screen

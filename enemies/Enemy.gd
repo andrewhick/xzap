@@ -19,7 +19,7 @@ var alt_direction = direction
 
 # Set number of moves per second:
 var time_passed = 0
-export var calls_per_sec = 4
+export var calls_per_sec = 3
 # Use float here, otherwise this evaluates to 0.
 var time_for_one_call = 1 / float(calls_per_sec)
 
